@@ -1,0 +1,1645 @@
+;SHIFTING
+
+
+
+
+;Procedure (to work from GBT computers): 
+;ssh cmartink@ssh.gb.nrao.edu (pw: rufjvm47)
+;ssh thales.gb.nrao.edu
+;cd /home/scratch/cmartink
+;cd mosaic
+
+;Procedure (to work from local machine):
+;cd /Users/research/mosaic
+;break up data into directories so that you only have two sets of data in each directory: the reference set and the set you want to shift. put cmshift.pro in that directory. Also put the reference set in the directory first.
+
+gbtidl
+dirin,'/Users/research/mosaic'
+summary
+getrec,2313 ;this is the first scan number of the set you want to shift
+fs=fshift()
+print,fs
+;if fs prints 0, you'll need to accum
+getrec,2312 ;this is the last scan number of the ref set
+accum
+getrec,2313
+fs=fshift()
+print,fs
+.compile cmshift.pro
+cmshift,2313,9945 ;the second number is the last number of the shift set
+
+
+__________________________________________________________
+
+;see shift.log,smooth.log and the cmcut.pro program for how to do those steps. at this stage the files have been shifted, smoothed, and cropped and are ready to be turned back into uvfits files. 
+
+
+~glangsto/bin/idlToSdfits -2 -o s01.uvfits s01.fits
+
+~glangsto/bin/idlToSdfits -2 -o s04.uvfits s04.fits
+
+~glangsto/bin/idlToSdfits -2 -o s05.uvfits s05.fits
+
+~glangsto/bin/idlToSdfits -2 -o s07.uvfits s07.fits
+
+~glangsto/bin/idlToSdfits -2 -o s11.uvfits s11.fits
+
+~glangsto/bin/idlToSdfits -2 -o s17.uvfits s17.fits
+
+~glangsto/bin/idlToSdfits -2 -o s49.uvfits s49.fits
+
+~glangsto/bin/idlToSdfits -2 -o s50.uvfits s50.fits
+
+~glangsto/bin/idlToSdfits -2 -o s51.uvfits s51.fits
+
+~glangsto/bin/idlToSdfits -2 -o s52.uvfits s52.fits
+
+~glangsto/bin/idlToSdfits -2 -o s53.uvfits s53.fits
+
+~glangsto/bin/idlToSdfits -2 -o s54.uvfits s54.fits
+
+
+;log into aips. use the user number 2015
+
+default uvlod
+datain '/Users/research/mosaic/suv/NUM1.UVFITS'
+outname 'num1'
+go uvlod
+
+default uvlod
+datain 'NUM4.UVFITS'
+outname 's04'
+go uvlod
+
+default uvlod
+datain 'NUM5.UVFITS'
+outname 's05'
+go uvlod
+
+default uvlod
+datain 'NUM11.UVFITS'
+outname 's11'
+go uvlod
+
+default uvlod
+datain 'NUM17.UVFITS'
+outname 's17'
+go uvlod
+
+default uvlod
+datain 'NUM49.UVFITS'
+outname 's49'
+go uvlod
+
+default uvlod
+datain 'NUM50.UVFITS'
+outname 's50'
+go uvlod
+
+default uvlod
+datain 'NUM51.UVFITS'
+outname 's51'
+go uvlod
+
+default uvlod
+datain 'NUM52.UVFITS'
+outname 's52'
+go uvlod
+
+default uvlod
+datain 'NUM53.UVFITS'
+outname 's53'
+go uvlod
+
+default uvlod
+datain 'NUM54.UVFITS'
+outname 's54'
+go uvlod
+
+
+;before the dbcon step, it's necessary to change any header parameters that differ from the original uvfits files to the shifted/smoothed/cut files. expain gethead and the for loop...
+
+for i=17 to 25; getn i; keyword 'crpix3'; gethead; inp puthead; end
+
+;...I was able to determine that the crpix3 and altpix header information was sometimes different (super random). But apparently just the crpix3 one matters because I guess all the crpix3 values need to be the same in order for dbcon to work. whatever. So I made all N784 and N672 uvfits files have the crpix3 header value 199.6667 using getn 7 (my ref file);keyword 'crpix3';gethead;getn target;puthead. They all should be ready to go now.
+
+
+
+
+;dbcon step now
+
+default dbcon
+getn 1
+get2n 2
+outname db12
+go dbcon
+
+default dbcon
+getn 33
+get2n 3
+outname db33
+go dbcon
+
+default dbcon
+getn 34
+get2n 4
+outname db344
+go dbcon
+
+default dbcon
+getn 35
+get2n 5
+outname db355
+go dbcon
+
+default dbcon
+getn 36
+get2n 6
+outname db366
+go dbcon
+
+default dbcon
+getn 37
+get2n 7
+outname db377
+go dbcon
+
+default dbcon
+getn 38
+get2n 8
+outname db388
+go dbcon
+
+default dbcon
+getn 39
+get2n 9
+outname db399
+go dbcon
+
+default dbcon
+getn 40
+get2n 10
+outname db4010
+go dbcon
+
+default dbcon
+getn 41
+get2n 11
+outname db4111
+go dbcon
+
+default dbcon
+getn 42
+get2n 12
+outname db4212
+go dbcon
+
+
+;sdgrd step
+
+default sdgrd
+outname 'mosaic.3.89'
+xtype=-16
+ytype=-16
+cellsize 210
+imsize 89 89
+xparm 522.76,270.253,444.346,2
+yparm=xparm
+optype='GLS'
+aparm=9,16,56.122,-32,51,43.2108
+getn 43
+go
+
+
+****** SPECTRAL SMOOTHING ********
+**********************************
+**********************************
+
+task 'avspc';default;
+getn 43;avoption 'subs';
+channel 2;
+outname 'mos.2spe'
+outclass 'AVSPC'
+go avspc
+
+
+task 'avspc';default;
+getn 43;avoption 'subs';
+channel 4;
+outname 'mos.4spe'
+outclass 'AVSPC'
+go avspc
+
+task 'avspc';default;
+getn 43;avoption 'subs';
+channel 8;
+outname 'mos.8spe'
+outclass 'AVSPC'
+go avspc
+
+
+*** making cube ***
+
+
+default sdgrd
+outname '1.x2.210'
+xtype=-16
+ytype=-16
+cellsize 210
+imsize 89 89
+xparm 522.76,270.253,444.346,2
+yparm=xparm
+optype='GLS'
+aparm=9,16,56.122,-32,51,43.2108
+getn 51
+go
+
+default sdgrd
+outname '1.x4.210'
+xtype=-16
+ytype=-16
+cellsize 210
+imsize 89 89
+xparm 522.76,270.253,444.346,2
+yparm=xparm
+optype='GLS'
+aparm=9,16,56.122,-32,51,43.2108
+getn 52
+go
+
+default sdgrd
+outname '1.x8.210'
+xtype=-16
+ytype=-16
+cellsize 210
+imsize 89 89
+xparm 522.76,270.253,444.346,2
+yparm=xparm
+optype='GLS'
+aparm=9,16,56.122,-32,51,43.2108
+getn 53
+go
+
+
+
+*** decided to go with an spectral smoothing of x4 (pcat 55)
+
+
+
+* changing units of cubes
+
+getn 55
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+******* MW TRIMMING *************
+*********************************
+*********************************
+
+
+
+* now looking at channels to find where MW is in each cube
+
+getn 55
+altswtch
+ltype=6
+tvmovie
+
+
+
+* now using SUBIM to cut out MW
+
+default subim
+
+getn 55
+outname '55.1'
+trc 0 0 146
+go subim
+default subim
+
+*out pcat = 57
+
+getn 55
+blc 0 0 183
+trc 0 0 190
+outname '55.2'
+go subim
+
+*out pcat = 58
+
+
+
+
+************** BLANKING *************
+*************************************
+*************************************
+
+
+*** now a general 2sigma blank. normally I'd use miriad to find the rms value, but you need to specify a box for that and I don't know what to do about that so I'm using kvis. my strategy: find box with no galaxy. every 25 frames find rms (for either 672 or 784 cube). then do same thing for other field. average all rms values. for the pcat 58 cube I'll only find rms for first and last frames.
+
+
+
+
+getn 57;clr2na;
+outname '57.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.028,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*output pcat = 60
+
+
+getn 58;clr2na;
+outname '58.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.024,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*output pcat = 61
+
+
+*** handblanking
+
+*** NOTE: first run only done on the 210'' cube.
+
+
+*1st half (actually has shit in it)
+
+task 'blank';getn 60;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '60.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 69
+outname '69.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 70;
+outname '70.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+*2nd half
+
+
+
+task 'blank';getn 61;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '61.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 62
+outname '62.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 63;
+outname '63.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+***regridding in miriad
+
+fits in=MASTR.fits op=xyin out=672-784.mosaic.mir
+
+puthd in=672-784.mosaic.mir/ctype1 value=GLON   type=ascii   
+puthd in=672-784.mosaic.mir/ctype2 value=GLAT   type=ascii   
+
+regrid in=672-784.mosaic.mir  out=672-784.mosaic.regrid axes=1,2 options=galeqsw 
+
+
+fits in=672-784.mosaic.regrid  out=672-784.regrid2.fits op=xyout
+
+
+***changing header
+
+fits in=672-784.orient2.fits op=xyin out=672-784.orient4.mir
+
+puthd in=672-784.orient4.mir/bunit value=k*m/s   type=ascii   
+
+fits in=672-784.orient4.mir  out=672-784.orient4.fits op=xyout
+
+
+
+*************
+
+*new test: map each galaxy separately then put them together in imcat in miriad. so first, ngc 784
+
+
+
+
+;dbcon step now
+
+default dbcon
+getn 1
+get2n 2
+outname db12
+go dbcon
+
+
+default dbcon
+getn 97
+get2n 3
+outname db973
+go dbcon
+
+
+default dbcon
+getn 98
+get2n 4
+outname db973
+go dbcon
+
+default dbcon
+getn 99
+get2n 5
+outname db973
+go dbcon
+
+default dbcon
+getn 100
+get2n 6
+outname db973
+go dbcon
+
+***now dbcon ngc 672
+
+default dbcon
+getn 7
+get2n 8
+outname db973
+go dbcon
+
+
+default dbcon
+getn 102
+get2n 9
+outname db973
+go dbcon
+
+
+default dbcon
+getn 103
+get2n 10
+outname db973
+go dbcon
+
+
+default dbcon
+getn 104
+get2n 11
+outname db973
+go dbcon
+
+
+default dbcon
+getn 105
+get2n 12
+outname db973
+go dbcon
+
+
+
+
+
+
+
+***spectral smoothing
+
+*N784
+
+task 'avspc';default;
+getn 101;avoption 'subs';
+channel 4;
+outname '784.4spe'
+outclass 'AVSPC'
+go avspc
+
+
+
+
+*N672
+
+task 'avspc';default;
+getn 106;avoption 'subs';
+channel 4;
+outname '672.4spe'
+outclass 'AVSPC'
+go avspc
+
+
+
+
+
+
+
+
+*****making cubes
+
+*n784
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname '784.cube.2'
+imsize 55 72
+xparm = 523 271 440 2
+yparm = 523 271 440 2
+optype = 'GLS'
+aparm = 9,21,45.3288,-31,56,45.5406
+getn 107
+
+go sdgrd
+
+
+
+
+
+
+
+
+*n672
+
+xtype = -16
+ytype = -16
+cellsize 210
+outname '672.4spe.cube'
+imsize 63 55
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 108
+go sdgrd
+
+
+
+
+
+
+
+* changing units of cubes
+
+getn 111
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+getn 112
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+*trying to make new NGC 784 cube that's big enough for both of them. then we'll try imcat again.
+
+*n784
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname '784.cube.2'
+imsize 123 123
+xparm = 523 271 440 2
+yparm = 523 271 440 2
+optype = 'GLS'
+aparm = 9,21,45.3288,-31,56,45.5406
+getn 107
+
+go sdgrd
+
+*output = 113
+
+getn 113
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+**** new tests: 2 6x6 degree cubes, same aparm value
+
+*n784
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname '784.cube'
+imsize 123 123
+xparm = 523 271 440 2
+yparm = 523 271 440 2
+optype = 'GLS'
+aparm = 9,18,8.472,-32,56,15.36
+outclass ='SDGRD'
+getn 107
+go sdgrd
+
+getn 114
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+*n672
+
+xtype = -16
+ytype = -16
+cellsize 210
+outname '672.cube'
+imsize 123 123
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,18,8.472,-32,56,15.36
+outclass ='SDGRD'
+getn 108
+go sdgrd
+
+getn 115
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+
+******************************************************
+******************************************************
+******************************************************
+******************************************************
+******************************************************
+******************************************************
+
+
+
+***NEW VERSION (AS OF MARCH 25) OF THE MOSAIC***
+
+*example uvlod command
+
+datain '/Users/research/mosaic_take2/N672.49.trim.uvfits';outname '49.trim'
+go uvlod
+
+
+*now, change some of the headers so the two match. open up the fits files as a text document to see which headers are different and what the values are. note that in the txt document crval 4 = crval 3 in the aips. same goes for cdelt4 and crpix4. I'm going to change all the headers to match the header of NGC 672 scan 50. the commands are as follows:
+
+getn 127
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+getn 128
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+getn 129
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+getn 130
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+getn 131
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+getn 132
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+getn 121
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+
+getn 123
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+
+getn 124
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+
+
+getn 125
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+getn 126
+keyword 'crval3'
+keyvalue 1418373970.88981 0
+puthead
+
+keyword 'altrpix'
+keyvalue 119.501885652561 0
+puthead
+
+keyword 'cdelt3'
+keyvalue -4577.92957396389 0
+puthead
+
+keyword 'crpix3'
+keyvalue 563.333333333333 0
+puthead
+
+
+
+
+
+*now concatenate everything
+
+default dbcon
+getn 121; get2n 122
+outname '121+122'
+go dbcon
+
+getn 133; get2n 123
+outname '133+123'
+go dbcon
+
+getn 134; get2n 124
+outname '134+124'
+go dbcon
+
+getn 135; get2n 125
+outname '135+125'
+go dbcon
+
+getn 136; get2n 126
+outname '136+126'
+go dbcon
+
+getn 137; get2n 127
+outname '137+127'
+go dbcon
+
+getn 138; get2n 128
+outname '138+128'
+go dbcon
+
+getn 139; get2n 129
+outname '139+129'
+go dbcon
+
+getn 140; get2n 130
+outname '140+130'
+go dbcon
+
+getn 141; get2n 131
+outname '141+131'
+go dbcon
+
+getn 142; get2n 132
+outname '142+132'
+go dbcon
+
+
+
+
+***make cube
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname 'newMosaic'
+imsize 220 220
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype = 'GLS'
+aparm = 9,18,19.7,-33,9,13.2
+getn 143
+
+go sdgrd
+
+*out: pcat 144
+
+
+
+
+dsgetn 144
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+**********************************
+
+*making new cube. for real. I'm re-uploading all of the uvfits files.
+
+
+datain '/Users/research/mosaic_take2/N672.49.trim.uvfits';outname '49.trim'
+go uvlod
+
+
+
+*once all the files are uploaded I'll change the crval3 and crpix3 values of the N672 files to match those of NGC 784 scan 01. then I'll dbcon everything.
+
+
+default dbcon
+getn 159; get2n 160
+outname '159+160'
+go dbcon
+
+getn 165; get2n 161
+outname '165+161'
+go dbcon
+
+getn 166; get2n 162
+outname '166+162'
+go dbcon
+
+getn 167; get2n 163
+outname '167+163'
+go dbcon
+
+getn 168; get2n 164
+outname '168+164'
+go dbcon
+
+
+
+***now convert NGC 672 file headers to match NGC 784 scan 01
+
+getn 153
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+
+
+getn 154
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+
+getn 155
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+
+getn 156
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+
+
+getn 157
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+
+getn 158
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+***now I'll dbcon the NGC 672 files onto the NGC 784 dbcon file
+
+
+
+getn 169; get2n 153
+outname '169+153'
+go dbcon
+
+
+getn 170; get2n 154
+outname '170+154'
+go dbcon
+
+
+getn 171; get2n 155
+outname '171+155'
+go dbcon
+
+
+getn 172; get2n 156
+outname '172+156'
+go dbcon
+
+
+getn 173; get2n 157
+outname '173+157'
+go dbcon
+
+
+getn 174; get2n 158
+outname '174+158'
+go dbcon
+
+
+
+
+
+
+***spectral smoothing
+
+task 'avspc';default;
+getn 175;avoption 'subs';
+channel 4;
+outname 'mos.spe'
+outclass 'AVSPC'
+go avspc
+
+
+
+
+**note, there's a large gap in the catalog with a bunch of tests. the cube wasn't aligning so I performed some tests.
+
+
+
+***make cube
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname 'take4'
+imsize 220 220
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype = 'GLS'
+aparm = 9,18,19.7,-33,9,13.2
+getn 187
+
+go sdgrd
+
+*out: pcat 189
+
+
+
+***DISREGARD THESE COMMANDS FOR NOW ***
+getn 189
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+
+******* MW TRIMMING *************
+*********************************
+*********************************
+
+
+
+* now looking at channels to find where MW is in each cube
+
+getn 189
+altswtch
+ltype=6
+tvmovie
+
+
+
+* now using SUBIM to cut out MW. there were only like 2 chans before the milky way so I'm not going to make a separate cube
+
+
+default subim
+
+getn 189
+outname '189.nomw'
+blc 0 0 40
+trc 0 0 180
+go subim
+default subim
+
+*out pcat = 190
+
+
+
+
+
+
+************** BLANKING *************
+*************************************
+*************************************
+
+
+*** now a general 2sigma blank. normally I'd use miriad to find the rms value, but you need to specify a box for that and I don't know what to do about that so I'm using kvis. my strategy: find box with no galaxy. every 20 frames find rms (for either 672 or 784 cube). then do same thing for other field. average all rms values. 
+
+
+
+
+getn 190;clr2na;
+outname '190.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.027,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*output pcat = 192
+
+
+
+
+
+*** handblanking
+
+*** NOTE: first run only done on the 210'' cube.
+
+
+
+task 'blank';getn 192;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '192.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 193
+outname '193.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 194;
+outname '194.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+
+
+
+***column density shit
+
+task 'maths';default 'maths';
+getn 
+outname .cd
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1.82E-5 0 0;
+go
+
+task 'puthead';getn 24;keyword 'BUNIT';
+keyvalue 0; keystrng '1E20/cm2';
+keytype ''; puthead
+
+
+
+*for vel maps
+
+task 'maths';default 'maths';
+getn 1
+outname '1.km'
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1E-3 0 0;
+go
+
+task 'puthead';getn 5;keyword 'BUNIT';
+keyvalue 0; keystrng 'KM/S';
+keytype ''; puthead
+
+
+
+
+*****trying things again. starting in an new aips username thing. let's do 2021.
+
+
+datain '/Users/research/mosaic_take2/N672.49.trim.uvfits';outname '49.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N672.50.trim.uvfits';outname '50.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N672.51.trim.uvfits';outname '51.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N672.52.trim.uvfits';outname '52.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N672.53.trim.uvfits';outname '53.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N672.54.trim.uvfits';outname '54.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.01.trim.uvfits';outname '01.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.04.trim.uvfits';outname '04.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.05.trim.uvfits';outname '05.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.07.trim.uvfits';outname '07.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.11.trim.uvfits';outname '11.trim'
+go uvlod
+
+datain '/Users/research/mosaic_take2/N784.17.trim.uvfits';outname '17.trim'
+go uvlod
+
+
+
+*dbcon all 784 files
+
+default dbcon
+getn 7; get2n 8
+outname '7+8'
+go dbcon
+
+
+default dbcon
+getn 13; get2n 9
+outname '13+9'
+go dbcon
+
+default dbcon
+getn 14; get2n 10
+outname '14+10'
+go dbcon
+
+default dbcon
+getn 15; get2n 11
+outname '15+11'
+go dbcon
+
+default dbcon
+getn 16; get2n 12
+outname '16+12'
+go dbcon
+
+
+
+
+
+***now convert NGC 672 file headers to match NGC 784 scan 01
+
+getn 1
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+getn 2
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+getn 3
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+getn 4
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+getn 5
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+getn 6
+keyword 'crval3'
+keyvalue 1419468444.66579 0
+puthead
+
+keyword 'crpix3'
+keyvalue 324 0
+puthead
+
+
+
+***now I'll dbcon the NGC 672 files onto the NGC 784 dbcon file
+
+
+default dbcon
+getn 17; get2n 1
+outname '17+1'
+go dbcon
+
+default dbcon
+getn 18; get2n 2
+outname '18+2'
+go dbcon
+
+default dbcon
+getn 19; get2n 3
+outname '19+3'
+go dbcon
+
+default dbcon
+getn 20; get2n 4
+outname '20+4'
+go dbcon
+
+default dbcon
+getn 21; get2n 5
+outname '21+5'
+go dbcon
+
+default dbcon
+getn 22; get2n 6
+outname '22+6'
+go dbcon
+
+
+
+***spectral smoothing
+
+task 'avspc';default;
+getn 23;avoption 'subs';
+channel 4;
+outname 'mos.spe'
+outclass 'AVSPC'
+go avspc
+
+
+***make cube
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname 'cube1'
+imsize 220 220
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype = 'GLS'
+aparm = 9,18,19.7,-33,9,13.2
+getn 24
+
+go sdgrd
+
+*out: pcat 25
+
+
+getn 25
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+*looks like glat/glon puthead commands mess everything up... wtf
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname 'cube2'
+imsize 220 220
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype = 'GLS'
+aparm = 9,18,19.7,-33,9,13.2
+getn 24
+
+go sdgrd
+
+
+
+
+
+
+
+7/9/15
+
+
+
+***Megan thinks the problem has to do with the optype, which it probably does and I must have just forgotten to do that or something last time. Anyway I'm redoing SDGRD with the negative sign and sending it to her to blank. Yay it'll work probably!
+
+
+
+xtype = -16
+ytype = -16
+cellsize = 210
+outname 'forMeg'
+imsize 220 220
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype = '-GLS'
+aparm = 9,18,19.7,-33,9,13.2
+getn 187
+
+go sdgrd
+
+*out: pcat 189

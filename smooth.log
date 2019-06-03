@@ -1,0 +1,83 @@
+; overall technique: each shifted file is in its own directory, so I will smooth each of those files in their own directories and do all manipulations there, then I will move those files to a giant folder later. The files will be smoothed to 2.5
+
+;scan 01
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,7631,2.5
+
+
+;scan 04
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,17999,2.5
+
+
+;scan 05
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,7055,2.5
+
+
+;scan 07
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,6767,2.5
+
+;scan 11
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,2591,2.5
+
+
+;scan 17
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,4895,2.5
+
+
+;scan 49
+gbtidl
+filein,'N672.49.edge.fits'
+.compile cmsmooth.pro
+cmsmooth,0,2313,2.5
+
+
+;scan 50
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,20291,2.5
+
+
+;scan 51
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,6051,2.5
+
+
+;scan 52
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,5874,2.5
+
+
+;scan 53
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,6229,2.5
+
+
+;scan 54
+gbtidl
+filein,'cmshift.fits'
+.compile cmsmooth.pro
+cmsmooth,0,4449,2.5

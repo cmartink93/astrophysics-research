@@ -1,0 +1,104 @@
+*This is a sample data reduction log to create moment maps.
+
+
+
+*These commands upload a file. for datain, put the path name and for outname put the name you want to show up in aips.
+
+datain '/Users/research/Desktop/N6789.int.FIT'
+outname 'n6789.cube'
+go fitld
+
+
+
+
+
+
+*If your cube is uploaded where the third axis is in frequency (you can tell by typing imh (imhead)), then these commands make it so that when you view the cube, each frame in the cube will be labeled as one velocity channel.
+
+getn 3 *here, put whatever pcat number your cube is in
+altswtch
+ltype=6
+
+
+
+
+
+
+
+*These commands are used to do a sweeping blank on the cube. To do this you need to know the RMS of your cube. If you need some different methods to do this, I'd be more than happy to send you those instructions, just let me know! 
+*In the commands below, the only things you need to change are the getn, the outname, and the dparm value of 0.033, which is your RMS value. For this example 0.033 is the 2sigma value, but you can use whatever sigma value you need.
+
+
+getn 5;clr2na;
+outname '5.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.033,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+
+
+
+
+*The next series of commands are used to handblank. First, export the blanked cube you made using these commands. Put the path name in the dataout part, where the last section is the name you want your output file to have. Sometimes aips will say the string size is too large and it'll yell at you, so try to shorten it.
+
+getn 3 *this is the cube you want to export
+dataout '/Users/research/sample.fits' 
+go fittp
+
+
+
+
+
+
+*So this next step is a personal preference of mine. I start by looking at the exported blanked cube in kvis or something and scroll through it looking for sources. If you find that your cube only contains sources in a smaller section of the cube, it's sometimes useful/more time efficient to crop the cube to only include the part of the cube you need. Blc is the starting channel and trc is the ending channel you want (but just change the third numbers). You can get the channel numbers by looking at the cube in tvmovie.
+
+
+getn 3
+blc 0 0 104
+trc 0 0 250
+outname '3.2'
+go subim
+
+
+
+
+
+*These commands execute the actual handblanking. Aips will tell you the instructions in the message window and in the aips window, but if you want some more tips on that let me know! For now I'll just give you the commands. All you need to change are getn and outname.
+
+
+task 'blank';getn 8;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '8.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+
+
+
+
+
+*These groups of commands create all the moment maps you'll need. Do the trans task first, figure out the output pcat number, and then use that pcat number for the xmom task. For both tasks the only things you'll need to change are the getn numbers, and the outname.
+
+
+
+task 'TRANS';default
+getn 9
+outname '9.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 10;
+outname '10.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+*voila! Moment maps! If you type >pcat, you should see a bunch of them there, and they should all be labeled. If I remember correctly, the second file aips creates is the moment 0 map. To export them, you can use the same commands as before. If you need to create a column density map from this, let me know and I can give you some commands for that as well. Don't hesitate to ask me any questions you have, and I hope this is a useful document!

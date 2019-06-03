@@ -1,0 +1,190 @@
+1. Download u, g, r, i, z images from SDSS
+
+http://cas.sdss.org/dr7/en/tools/explore/obj.asp?ra=209.281094&dec=5.251889
+Select FITS under PhotoObj and get the Header-supplemented corrected frames
+
+
+
+
+
+
+
+
+
+2. Copy out the region of this large image that contains your galaxy 
+
+xgterm & 
+cl 
+images
+imcopy frame-g-n5373.fits[0][447:887,410:810] sdssi
+;note that in brackets, the first pair is the x range and the second pair is the y range
+
+
+
+
+
+
+
+
+
+3. Use a bright but not saturated star to make a centered, scaled PSF
+
+to get psf use psfstack.pro in idl.
+
+
+
+n5373 = readfits('frame-g-n5373.fits',exten_n = 0)
+readcol,'starpsf.txt',x,y
+
+
+
+
+;starpsf.txt contains a coordinate list of star centroids. BE AS EXACT AS YOU CAN!
+;ds9 is good to use for this, but you can't necessarily trust their centroid algorithm
+
+;you can change the dw (half width of the psf image), but you must use an odd number
+;we added -1 and -1 to make the psf more central
+;to get the header information:
+d=mrdfits('frame-g-n5373.fits',0,h)
+print,h ;h will give you the header
+
+
+
+
+psfstack,n5373,x-1,y-1,psf4,dw=19
+
+mwrfits, psf4,'psfTest.fits' ;this command writes out the psf as a fits file
+
+
+
+;if you need to trim to get it to be more central use these commands:
+
+cl
+images
+imcopy psfTest.fits[2:39,2:39] psfTestTest.fits
+
+
+
+
+;note everything is in units of nanomaggys or whatever so the sdssi and psfi images need to be scaled. if you go to the header you'll find a parameter called nmgy. Divide the images by that using iraf to get images in units of counts.
+
+cl
+images
+
+imarith sdssi / 0.00404823 sdssi_corr ;get from header
+
+imarith psfTest.fits * 35665.89127 psfi ;this is just a large number to make values sensible. it doesn't really matter which number you choose because the next step corrects it
+
+
+;to get the scaling factor do the peak of the galaxy / peak of the psf. this gives the psfi.
+
+
+;okay once you have a nice psf you can do this in iraf to scale the psf. the goal of this is to make the peak of the psf and the peak of the sdss image the same.
+
+
+
+imarith psfi.fits * 1.074 psfi_corr
+
+
+
+;peak of galaxy is 1999.33 cts, peak of unscaled PSF is 1861, so 1.074 (the sdss image val is 107.4% of the psf val). after you do this step, go into ds9 and make sure the two peaks are the same.
+
+
+
+
+
+
+
+
+
+
+;now you can go onto the galfit part with your new psfi file. you have to move the psfi_corr and sdssi_corr files outside to the galfit folder.
+;if your txt file is called gal.txt:
+
+./galfit gal.txt
+
+;at the end you should get some final countdown thing like this:
+
+Iteration : 30    Chi2nu: 3.873e+00     dChi2/Chi2: 2.37e-08    alamda: 1e-04     
+ sersic    : (  201.03,   200.43)   14.03     28.06    8.56    0.93    59.82
+COUNTDOWN = 0
+
+
+
+;this is just the first run of galfit to find the zero point magnitude value, which here is 14.03. based on the sdss table of magnitude values, the sdss g magnitude of this galaxy should be 14.95. 14.95-14.03 = .92. So, adjust the zero point magnitude listed in the gal.txt file by adding .92. Then run galfit again.
+
+;the new final countdown thing is:
+
+Iteration : 19    Chi2nu: 3.873e+00     dChi2/Chi2: 2.52e-08    alamda: 1e-05     
+ sersic    : (  201.03,   200.43)   14.95     28.06    8.56    0.93    59.82
+COUNTDOWN = 0 
+
+
+
+
+
+
+
+
+
+
+
+;now move the fiti_block.fits file to the computer's iraf folder. make sure you move the other files in the galfit folder back to the galaxy folder to avoid confusion later.
+
+;run everything from the iraf folder.
+
+
+
+
+imcopy fiti_block.fits[2] modelg
+
+;to do the stsdas part you might have to go into the iraf folder and move your files there.
+
+
+stsdas
+analysis
+isophote
+
+
+ellipse modelg.fits modelg.tab
+ellipse sdssi_corr.fits sdssg_corr.tab inellip=modeli.tab ;note that for the g filter, the inellip should contain this modeli.tab from the i filter, NOT the g filter. everything else should be from the g filter data though
+tdump modelg.tab datafile=modelg.idl columns=sma,intens,int_err
+tdump sdssg_corr.tab datafile=sdssg.idl columns=sma,intens,int_err
+
+
+ellipse psfi_corr.fits psfg.tab
+tdump psfg.tab datafile=psfg.idl columns=sma,intens,int_err
+ 
+
+
+
+
+
+
+
+;plotting
+
+readcol, 'modelg.idl', ma, mi, mierr 
+readcol, 'sdssg.idl', sa, si, sierr
+readcol, 'psfg.idl', pa, pi, pierr
+loadct, 39
+
+
+pix = 0.396 ; arc-seconds per pixel
+zp =  24.52  ; magnitude zero point
+mr = pix*ma & sr = pix*sa & pr = pix*pa
+
+ok = where(mi gt 0.05*(1148-1000.)) & mi = mi[ok] & si = si[ok] & mr = mr[ok] & sr = sr[ok]
+mm = -2.5*alog10(mi/(pix*pix))+zp & sm = -2.5*alog10(si/(pix*pix))+zp
+pm = -2.5*alog10(pi/(pix*pix))+zp
+
+plot, mr, mm, /xlog, yra=[22,12], xra=[0.1,60], xstyle=1, ytitle='!7l!X (mag arcsec!U-2!N)', $
+	xtitle='Semi-major axis (arc-seconds)', /nodata
+oplot, sr, sm, psym=4
+oplot, mr, mm, lines=0, color=250, thick=2
+oplot, pr, pm, lines=2, color=70
+
+;to write out file:
+
+write_png,'n5373g.png',tvrd()
+

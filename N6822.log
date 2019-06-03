@@ -1,0 +1,272 @@
+***ngc 6822***
+
+default uvlod
+datain '/Users/research/Desktop/N6822.DBCON.FITS'
+outname 'n6822.DB'
+go uvlod
+
+
+*** in AIPS username is 2010
+
+
+*** NOTE: FIRST RUN IS MEANT TO CREATE A 4CH SPECTRALLY SMOOTHED, 2SIGMA BLANKED CUBE
+
+
+
+****** SPECTRAL SMOOTHING ********
+**********************************
+**********************************
+
+task 'avspc';default;
+getn 1;avoption 'subs';
+channel 4;
+outname 'n6822.4spe'
+outclass 'AVSPC'
+go avspc
+
+
+*** making cube ***
+
+
+default sdgrd
+xtype = -16
+ytype = -16
+cellsize = 210
+outname '1.x4.210'
+imsize 55 55
+xparm = 522.32, 269.86533, 438.7488, 2
+yparm = 522.32, 269.86533, 438.7488, 2
+optype = 'GLS'
+aparm = 1,41,21.468012,-18,23,56.94
+getn 2
+
+go sdgrd
+
+*output = pcat 3
+
+
+
+* changing units of cubes
+
+getn 3
+keyword 'ctype1'
+gethead
+keystr = 'GLON-GLS' !! substr(keystr, 5, 8)
+puthead
+keyword 'ctype2'
+gethead
+keystr = 'GLAT-GLS' !! substr(keystr, 5, 8)
+puthead
+
+
+
+
+******* MW TRIMMING *************
+*********************************
+*********************************
+
+
+
+* now looking at channels to find where MW is in each cube
+
+getn 3
+altswtch
+ltype=6
+tvmovie
+
+
+
+* now using SUBIM to cut out MW
+
+default subim
+
+getn 3
+outname '3.1'
+trc 0 0 162
+go subim
+default subim
+
+*out pcat = 4
+
+
+getn 3
+blc 0 0 187
+trc 0 0 271
+outname '3.2'
+go subim
+
+*out pcat = 5
+
+
+
+************** BLANKING *************
+*************************************
+*************************************
+
+
+*** now a general 2sigma blank. miriad wasn't working so I used kvis to get the rms value by sampling the standard deviation in 6 evenly spaced frames throughout each cube
+
+
+getn 4;clr2na;
+outname '4.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0374,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*output pcat = 6
+
+
+getn 5;clr2na;
+outname '5.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.033,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*output pcat = 7
+
+
+
+*** handblanking
+
+*** NOTE: first run only done on the 210'' cube.
+
+
+*this was done on the cube from pcat six, but a subim-ed version
+
+task 'blank';getn 19;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '6.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 20
+outname '20.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 21;
+outname '21.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+***column density shit
+
+task 'maths';default 'maths';
+getn 23
+outname 23.cd
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1.82E-5 0 0;
+go
+
+task 'puthead';getn 27;keyword 'BUNIT';
+keyvalue 0; keystrng '1E20/cm2';
+keytype ''; puthead
+
+
+*convert the unit label of the mom1 map to km/s
+
+
+task 'maths';default 'maths';
+getn 24
+outname '24.km'
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1E-3 0 0;
+go
+
+task 'puthead';getn 28;keyword 'BUNIT';
+keyvalue 0; keystrng 'KM/S';
+keytype ''; puthead
+
+
+
+
+
+
+
+
+
+
+
+
+* 3 sigma blanking. only done on 1st half b/c 2nd half was empty in the 2sig
+
+getn 4;clr2na;
+outname '4.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0561,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+out: pcat 18
+
+
+
+***handblanking, etc
+
+**used pcat 18, but a subim-ed version
+
+task 'blank';getn 29;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '18.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 30
+outname '30.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 31;
+outname '31.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+***column density shit
+
+task 'maths';default 'maths';
+getn 33
+outname 33.cd
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1.82E-5 0 0;
+go
+
+task 'puthead';getn 37;keyword 'BUNIT';
+keyvalue 0; keystrng '1E20/cm2';
+keytype ''; puthead
+
+
+***velocity conversions
+
+
+task 'maths';default 'maths';
+getn 34
+outname '34.km'
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY';cparm 0 1E-3 0 0;
+go
+
+task 'puthead';getn 38;keyword 'BUNIT';
+keyvalue 0; keystrng 'KM/S';
+keytype ''; puthead

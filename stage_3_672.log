@@ -1,0 +1,1108 @@
+****** SPECTRAL SMOOTHING TESTS ********
+****************************************
+****************************************
+
+* now testing NGC 672
+
+* creating smoothing files
+
+task 'avspc';default;
+>getn 100;avoption 'subs';
+AIPS 2: Got(1)   disk= 1  user=1993   type=UV   N678_1106.DBCON.1
+>channel 2;
+>outname '100.x2'
+>outclass 'AVSPC'
+>go avspc
+
+
+task 'avspc';default;
+>getn 100;avoption 'subs';
+AIPS 2: Got(1)   disk= 1  user=1993   type=UV   N678_1106.DBCON.1
+>channel 4;
+>outname '100.x4'
+>outclass 'AVSPC'
+>go avspc
+
+
+task 'avspc';default;
+>getn 100;avoption 'subs';
+AIPS 2: Got(1)   disk= 1  user=1993   type=UV   N678_1106.DBCON.1
+>channel 8;
+>outname '100.x8'
+>outclass 'AVSPC'
+>go avspc
+
+* turning smoothing files into cubes
+
+xtype = -16
+ytype = -16
+cellsize 210
+outname '250.x2.210'
+imsize 63 55
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 250
+go sdgrd
+
+xtype = -16
+ytype = -16
+cellsize 120
+outname '250.x2.120'
+imsize 95 80
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 250
+go sdgrd
+
+
+
+
+xtype = -16
+ytype = -16
+cellsize 210
+outname '251.x4.210'
+imsize 63 55
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 251
+go sdgrd
+
+xtype = -16
+ytype = -16
+cellsize 120
+outname '251.x4.120'
+imsize 95 80
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 251
+go sdgrd
+
+
+
+
+xtype = -16
+ytype = -16
+cellsize 210
+outname '252.x8.210'
+imsize 63 55
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 252
+go sdgrd
+
+xtype = -16
+ytype = -16
+cellsize 120
+outname '252.x8.120'
+imsize 95 80
+xparm = 524 271 440 2
+yparm = 524 271 440 2
+optype 'GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+getn 252
+go sdgrd
+
+*now spatially smoothing all cubes (x2)
+
+
+task 'convl';default 'convl';
+getn 254;opcode '';
+blc 0; trc 0; clr2na; outname '672_2x_210'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 255;opcode '';
+blc 0; trc 0; clr2na; outname '672_2x_120'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+
+task 'convl';default 'convl';
+getn 256;opcode '';
+blc 0; trc 0; clr2na; outname '672_4x_210'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 257;opcode '';
+blc 0; trc 0; clr2na; outname '672_4x_120'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+
+task 'convl';default 'convl';
+getn 258;opcode '';
+blc 0; trc 0; clr2na; outname '672_8x_210'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 259;opcode '';
+blc 0; trc 0; clr2na; outname '672_8x_120'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+*now spatially smoothing all cubes (x4)
+
+
+task 'convl';default 'convl';
+getn 254;opcode '';
+blc 0; trc 0; clr2na; outname '672_2x_210'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 255;opcode '';
+blc 0; trc 0; clr2na; outname '672_2x_120'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+
+task 'convl';default 'convl';
+getn 256;opcode '';
+blc 0; trc 0; clr2na; outname '672_4x_210'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 257;opcode '';
+blc 0; trc 0; clr2na; outname '672_4x_120'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+
+task 'convl';default 'convl';
+getn 258;opcode '';
+blc 0; trc 0; clr2na; outname '672_8x_210'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 259;opcode '';
+blc 0; trc 0; clr2na; outname '672_8x_120'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+****** RECREATING IDEAL SMOOTH CUBES ********
+*********************************************
+*********************************************
+
+*redoing spectral x4, spectral x8, spec & 2x spatial x4, spec & 4x spatial, x4 (all 210'' pixels)
+
+getn 251
+xtype=-16;ytype=-16
+cellsize 210;imsize 63 55
+xparm = 523.16, 270.3, 440, 2
+yparm=xparm
+optype='-GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+outname 'N672_spex4';outclass 'SDGRD1'
+go sdgrd
+
+getn 252
+xtype=-16;ytype=-16
+cellsize 210;imsize 63 55
+xparm = 523.16, 270.3, 440, 2
+yparm=xparm
+optype='-GLS'
+aparm = 9,12,6.91248,-33,46,40.8792
+outname 'N672_spex8';outclass 'SDGRD1'
+go sdgrd
+
+task 'convl';default 'convl';
+getn 367;opcode '';
+blc 0; trc 0; clr2na; outname '672_2x_4x'
+outclass 'convl';
+bmaj 900;bmin 900; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+task 'convl';default 'convl';
+getn 367;opcode '';
+blc 0; trc 0; clr2na; outname '672_4x_4x'
+outclass 'convl';
+bmaj 1800;bmin 1800; bpa 0; factor 0;
+doblank 0; baddisk 0;
+go convl
+
+
+
+****** MW TRIMMING *************
+*********************************
+*********************************
+
+
+
+* now looking at channels to find where MW is in each cube
+
+getn 367
+altswtch
+ltype=6
+tvmovie
+
+getn 368
+altswtch
+ltype=6
+tvmovie
+
+getn 369
+altswtch
+ltype=6
+tvmovie
+
+getn 370
+altswtch
+ltype=6
+tvmovie
+
+
+
+
+* now using SUBIM to cut out MW
+
+default subim
+
+getn 367
+outname '367.1'
+trc 0 0 150
+go subim
+default subim
+getn 367
+blc 0 0 188
+trc 0 0 196
+outname '367.2'
+go subim
+
+
+
+default subim
+
+getn 368
+outname '368.1'
+trc 0 0 75
+go subim
+default subim
+getn 368
+blc 0 0 95
+trc 0 0 98
+outname '368.2'
+go subim
+
+
+
+default subim
+
+getn 369
+outname '369.1'
+trc 0 0 149
+go subim
+default subim
+getn 369
+blc 0 0 188
+trc 0 0 196
+outname '369.2'
+go subim
+
+
+
+default subim
+
+getn 370
+outname '370.1'
+trc 0 0 150
+go subim
+default subim
+getn 370
+blc 0 0 190
+trc 0 0 196
+outname '370.2'
+go subim
+
+
+********* BLANKING AND MOMENT MAPS ************
+***********************************************
+***********************************************
+
+
+getn 401
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   367.1.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 401
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   367.1.SUBIM.1
+>dataout 'FITS:KMCQUINN/401.1.CUBE.FITS'
+>go fittp
+
+
+getn 402
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   367.2.SUBIM.1
+>keyword 'ctype1
+>keyword 'ctype1'
+>gethead
+>keystr =
+AIPS 1: STACK LIMITS
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2' !! substr(keystr,5,8)
+AIPS 1: STRING SIZE
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 402
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   367.2.SUBIM.1
+>dataout 'FITS:KMCQUINN/402.2.CUBE.FITS'
+>go fittp
+
+
+>getn 403
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   368.1.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 403
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   368.1.SUBIM.1
+>dataout 'FITS:KMCQUINN/403.1.CUBE.FITS'
+>go fittp
+
+
+>getn 404
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   368.2.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 404
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   368.2.SUBIM.1
+>dataout 'FITS:KMCQUINN/404.2.CUBE.FITS'
+>go fittp
+
+
+getn 407
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   369.1.SUBIM.2
+>keyword 'ctype1'
+>gethead
+>keystr =
+AIPS 1: STACK LIMITS
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 407
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   369.1.SUBIM.2
+>dataout 'FITS:KMCQUINN/407.1.CUBE.FITS'
+>go fittp
+
+
+getn 406
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   369.2.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr =
+AIPS 1: STACK LIMITS
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 406
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   369.2.SUBIM.1
+>dataout 'FITS:KMCQUINN/406.2.CUBE.FITS'
+>go fittp
+
+getn 408
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   370.1.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 408
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   370.1.SUBIM.1
+>dataout 'FITS:KMCQUINN/408.1.CUBE.FITS'
+>go fittp
+
+>getn 409
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   370.2.SUBIM.1
+>keyword 'ctype1'
+>gethead
+>keystr = 'GLON-GLS' !! substr(keystr,5,8)
+>puthead
+>keyword 'ctype2'
+>gethead
+>keystr = 'GLAT-GLS' !! substr(kestr,5,8)
+AIPS 1: SYMBOL?       KESTR
+>keystr = 'GLAT-GLS' !! substr(keystr,5,8)
+>puthead
+>default fittp
+>getn 409
+AIPS 1: Got(1)   disk= 1  user=1993   type=MA   370.2.SUBIM.1
+>dataout 'FITS:KMCQUINN/409.2.CUBE.FITS'
+>go fittp
+
+
+*now finding the rms values from miriad
+
+fits in=672.401.FITS out=401.FITS op=xyin
+imstat in=401.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.402.FITS out=402.FITS op=xyin
+imstat in=402.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.403.FITS out=403.FITS op=xyin
+imstat in=403.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.404.FITS out=404.FITS op=xyin
+imstat in=404.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.407.FITS out=407.FITS op=xyin
+imstat in=407.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.408.FITS out=408.FITS op=xyin
+imstat in=408.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=672.409.FITS out=409.FITS op=xyin
+imstat in=409.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02
+
+fits in=406.FITS out=406.1.FITS op=xyin
+imstat in=406.1.FITS device=/xs region='boxes(12,14,52,45)' options=45,0.02\
+
+
+*now doing a sweeping 2sigma blank
+
+getn 401;clr2na;
+outname '401.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.026,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 402;clr2na;
+outname '402.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0256,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 403;clr2na;
+outname '403.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.02,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 404;clr2na;
+outname '404.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0196,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 407;clr2na;
+outname '407.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.02,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 406;clr2na;
+outname '406.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.218,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 408;clr2na;
+outname '408.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.5,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 409;clr2na;
+outname '409.2sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.56,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+*now for handblanking and moment maps
+
+
+task 'blank';getn 443;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '443.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 617
+outname '617.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 618;
+outname '618.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+task 'blank';getn 444;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '444.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 624
+outname '624.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 625;
+outname '625.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+task 'blank';getn 445;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '445.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 631
+outname '631.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 632;
+outname '632.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+task 'blank';getn 446;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '446.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 638
+outname '638.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 639;
+outname '639.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+task 'blank';getn 447;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '447.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 645
+outname '645.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 646;
+outname '646.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+task 'blank';getn 448;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '448.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 652
+outname '652.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 653;
+outname '653.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+task 'blank';getn 449;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '449.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 660
+outname '660.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 661;
+outname '661.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+******* 2.5sig, 3sig blank **********
+*************************************
+*************************************
+
+*now doing a sweeping 2sigma blank
+
+getn 401;clr2na;
+outname '401.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0325,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 402;clr2na;
+outname '402.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.032,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 403;clr2na;
+outname '403.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.025,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 404;clr2na;
+outname '404.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0245,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 407;clr2na;
+outname '407.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.025,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 406;clr2na;
+outname '406.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.2725,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 408;clr2na;
+outname '408.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.625,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 409;clr2na;
+outname '409.2.5sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.7,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+
+*now doing a sweeping 3sigma blank
+
+getn 401;clr2na;
+outname '401.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.039,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 402;clr2na;
+outname '402.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0384,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 403;clr2na;
+outname '403.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.03,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 404;clr2na;
+outname '404.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.0294,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 407;clr2na;
+outname '407.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.03,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 406;clr2na;
+outname '406.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.327,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+getn 408;clr2na;
+outname '408.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.75,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+getn 409;clr2na;
+outname '409.3sig'
+outclass 'BL';
+trc 0;blc 0;bchan 0;echan 0;
+dooutput -1;doalign 1;opcode 'SELC';
+dparm 1,0,10000,0.84,0;
+doinvers -1;tvchan 1;pixrange 0;
+functype '';txinc 1;tyinc 1;
+go blank
+
+
+
+* now handblanking and moment maps
+
+*2.5sig cube (spectral only x4)
+
+task 'blank';getn 815;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '815.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 858
+outname '858.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 867;
+outname '867.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+*3sigma handblanked cube
+
+
+task 'blank';getn 823;clr2na;
+outclass 'MASTR';dparm 0;
+blc 0;trc 0;outname '823.hb'
+trc 0;bchan 0; echan 0;
+dooutput -1; doalign 1; opcode 'TVCU';
+doinvers -1; tvchan 1; pixrange 0;
+txinc 1; tyinc 1;
+tvreset;tvclear;go
+
+
+task 'TRANS';default
+getn 860
+outname '860.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 868;
+outname '868.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+***** GIPSY *******
+*******************
+*******************
+
+
+* So I basically just experimented with different sigma values and velocity channel widths to see which features remained and how the features changed as the sigma values and velocity channel widths changed.
+
+
+
+****** velocity-cut cubes/moment maps (from 2sigma cubes) *********
+*******************************************************************
+*******************************************************************
+
+
+
+task 'subim';default
+getn 443
+blc 0 0 0
+trc 0 0 114
+outname '443.velcrop'
+outclass 'BL'
+go
+
+
+task 'blank';getn 959;clr2na;
+outclass 'MASTR'; dparm 0;
+blc 0;trc 0;outname '959.hb'
+bchan 0;echan 0;
+dooutput -1;doalign 1; opcode 'tvcu';
+doinvers -1;tvchan 1; pixrange 0;
+txinc 1;tyinc 1;
+
+task 'TRANS';default
+getn 961
+outname '961.trans';blc 0;trc 0;
+transcod '312';baddisk 0;go
+
+task 'XMOM';default 'xmom';getn 963;
+outname '963.mom';                                              
+blc 0; trc 0; flux -10000; icut -10000;
+optype '';pbparm 0; baddisk 0; go
+
+
+
+
+
+*converting moment maps to km/s
+
+
+task 'maths';default 'maths';
+getn 970
+outname '970.conv';
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY'; cparm 0 0.001 0 0;
+go maths
+
+task 'puthead';getn 976;keyword 'BUNIT';
+keyvalue 0;keystrng 'K*KM/S';
+keytype '';puthead
+
+
+
+task 'maths';default 'maths';
+getn 971
+outname '971.conv';
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY'; cparm 0 0.001 0 0;
+go maths
+
+task 'puthead';getn 977;keyword 'BUNIT';
+keyvalue 0;keystrng 'KM/S';
+keytype '';puthead
+
+
+
+*converting moment 0 map to column density map
+
+task 'maths';default 'maths';
+getn 976
+outname '976.conv';
+outseq 0;outdisk 0; blc 0;trc 0;
+opcode 'POLY'; cparm 0 0.01823 0 0;
+go maths
+
+task 'puthead';getn 979;keyword 'BUNIT';
+keyvalue 0;keystrng '1E20/cm^2';
+keytype '';puthead

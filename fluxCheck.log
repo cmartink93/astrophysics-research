@@ -1,0 +1,1236 @@
+##################################################################################
+##################################################################################
+##################################################################################
+				NGC 5373
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+
+punlearn fluximage
+fluximage 'repro/acisf14932_repro_evt2.fits' img1/run1
+
+
+
+
+
+
+#output##################################
+#########################################
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf486288730N002_asol1.fits found.
+Bad-pixel file repro/acisf14932_repro_bpix1.fits found.
+Mask file repro/acisf14932_002N002_msk1.fits found.
+
+The output images will have 342 by 393 pixels, pixel size of 3.936 arcsec,
+    and cover x=2544.5:5280.5:8,y=2784.5:5928.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14932
+Creating 3 instrument maps for obsid 14932
+Creating 3 exposure maps for obsid 14932
+Combining 3 exposure maps for obsid 14932
+Thresholding data for obsid 14932
+Exposure-correcting image for obsid 14932
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14932_repro_evt2.fits "13:57:07.4 +05:15:07" single/run1
+
+
+
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+13 57 7.4 +5 15 7.0     Rate           5.37E-05 c/s (1.3E-06,0.000142)         
+                        Flux           2.63E-16 erg/cm2/s (6.35E-18,6.93E-16)  
+                        Mod.Flux       3.87E-16 erg/cm2/s (9.35E-18,1.02E-15)  
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				MRK 810
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+punlearn fluximage
+fluximage 'repro/acisf14933_repro_evt2.fits' img1/
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf489885455N002_asol1.fits found.
+Bad-pixel file repro/acisf14933_repro_bpix1.fits found.
+Mask file repro/acisf14933_000N002_msk1.fits found.
+
+The output images will have 281 by 413 pixels, pixel size of 3.936 arcsec,
+    and cover x=2856.5:5104.5:8,y=2768.5:6072.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14933
+Creating 3 instrument maps for obsid 14933
+Creating 3 exposure maps for obsid 14933
+Combining 3 exposure maps for obsid 14933
+Thresholding data for obsid 14933
+Exposure-correcting image for obsid 14933
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14933_repro_evt2.fits "14:22:37.1 +59:55:51" single/run1
+
+
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+14 22 37.1 +59 55 51.0  Rate           0.0027 c/s (0.00219,0.00322)            
+                        Flux           1.85E-14 erg/cm2/s (1.5E-14,2.2E-14)    
+                        Mod.Flux       1.96E-14 erg/cm2/s (1.59E-14,2.33E-14)  
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				IC 0862
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+
+
+punlearn fluximage
+fluximage 'repro/acisf14935_repro_evt2.fits' img1/
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf478098512N002_asol1.fits found.
+Bad-pixel file repro/acisf14935_repro_bpix1.fits found.
+Mask file repro/acisf14935_000N002_msk1.fits found.
+
+The output images will have 193 by 408 pixels, pixel size of 3.936 arcsec,
+    and cover x=3256.5:4800.5:8,y=2128.5:5392.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14935
+Creating 3 instrument maps for obsid 14935
+Creating 3 exposure maps for obsid 14935
+Combining 3 exposure maps for obsid 14935
+Thresholding data for obsid 14935
+Exposure-correcting image for obsid 14935
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14935_repro_evt2.fits "13:16:15.4 +20:02:52" single/run1
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+13 16 15.4 +20 2 52.0   Rate           0.000104 c/s (2.14E-05,0.00024)         
+                        Flux           6.17E-16 erg/cm2/s (1.26E-16,1.42E-15)  
+                        Mod.Flux       7.45E-16 erg/cm2/s (1.53E-16,1.71E-15)  
+
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				NGC 2518
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+
+
+punlearn fluximage
+fluximage 'repro/acisf14936_repro_evt2.fits' img1/
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf473762130N002_asol1.fits found.
+Bad-pixel file repro/acisf14936_repro_bpix1.fits found.
+Mask file repro/acisf14936_000N002_msk1.fits found.
+
+The output images will have 408 by 306 pixels, pixel size of 3.936 arcsec,
+    and cover x=2160.5:5424.5:8,y=2728.5:5176.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14936
+Creating 3 instrument maps for obsid 14936
+Creating 3 exposure maps for obsid 14936
+Combining 3 exposure maps for obsid 14936
+Thresholding data for obsid 14936
+Exposure-correcting image for obsid 14936
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14936_repro_evt2.fits "08:07:20.2 +51:07:54" single/run1
+
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+s
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+8 7 20.2 +51 7 54.0     Rate           5.66E-05 c/s (0,0.000355)               
+                        Flux           1.14E-16 erg/cm2/s (0,7.18E-16)         
+                        Mod.Flux       4.02E-16 erg/cm2/s (0,2.53E-15)
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				UGGC 08754
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+
+
+punlearn fluximage
+fluximage 'repro/acisf14937_repro_evt2.fits' img1/
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf492110828N002_asol1.fits found.
+Bad-pixel file repro/acisf14937_repro_bpix1.fits found.
+Mask file repro/acisf14937_000N002_msk1.fits found.
+
+The output images will have 159 by 402 pixels, pixel size of 3.936 arcsec,
+    and cover x=3456.5:4728.5:8,y=2824.5:6040.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14937
+Creating 3 instrument maps for obsid 14937
+Creating 3 exposure maps for obsid 14937
+Combining 3 exposure maps for obsid 14937
+Thresholding data for obsid 14937
+Exposure-correcting image for obsid 14937
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14937_repro_evt2.fits "13:50:39.1 +35:02:18" single/run1
+
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+13 50 39.1 +35 2 18.0   Rate           0.000184 c/s (4.64E-05,0.000448)        
+                        Flux           1.1E-15 erg/cm2/s (2.77E-16,2.68E-15)   
+                        Mod.Flux       1.34E-15 erg/cm2/s (3.36E-16,3.25E-15)
+
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				PGC 3091110
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+#go into xray data galaxy folder.
+
+punlearn chandra_repro
+chandra_repro mode=h
+
+
+
+punlearn fluximage
+fluximage 'repro/acisf14934_repro_evt2.fits' img1/
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+Using CSC ACIS broad science energy band.
+Aspect solution repro/pcadf498618086N002_asol1.fits found.
+Bad-pixel file repro/acisf14934_repro_bpix1.fits found.
+Mask file repro/acisf14934_002N002_msk1.fits found.
+
+The output images will have 234 by 414 pixels, pixel size of 3.936 arcsec,
+    and cover x=3232.5:5104.5:8,y=2112.5:5424.5:8.
+
+Running tasks in parallel with 2 processors.
+Creating aspect histograms for obsid 14934
+Creating 3 instrument maps for obsid 14934
+Creating 3 exposure maps for obsid 14934
+Combining 3 exposure maps for obsid 14934
+Thresholding data for obsid 14934
+Exposure-correcting image for obsid 14934
+
+The following files were created:
+
+ The clipped counts image is:
+     img1/broad_thresh.img
+
+ The clipped exposure map is:
+     img1/broad_thresh.expmap
+
+ The exposure-corrected image is:
+     img1/broad_flux.img
+
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+punlearn srcflux
+srcflux repro/acisf14934_repro_evt2.fits "09:17:19.6 +11:37:43" single/run1
+
+
+
+
+
+
+
+
+
+
+#output##################################
+#########################################
+
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+9 17 19.6 +11 37 43.0   Rate           0.00201 c/s (0.00134,0.00286)           
+                        Flux           1.29E-14 erg/cm2/s (8.58E-15,1.84E-14)  
+                        Mod.Flux       1.47E-14 erg/cm2/s (9.77E-15,2.09E-14)  
+
+
+
+
+#########################################
+#########################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				  
+
+                                  TAKE 2
+
+
+			*with wavdetect now for new #s
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				NGC 5373
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+dmcopy "repro/acisf14932_repro_evt2.fits[EVENTS][bin x=4005:4205:1,y=4017:4217:1][energy=500:7000]" smalln5373.fits
+
+mkpsfmap "smalln5373.fits" outfile=psfmapn5373.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smalln5373.fits"
+pset wavdetect psffile=psfmapn5373.fits
+pset wavdetect outfile=n5373_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+in idl:
+
+d=mrdfits("n5373_wav.fits",1,h) ;reads in the table
+ra = d.ra 
+dec = d.dec 
+opt_ra = 150.0 ;optical RA
+opt_dec = 30.0 ;optical DEC
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist ;finds the distance between the RA/DEC of detections and the optical RA/DEC of our object
+mind = where(dist eq min(dist)) ;finds the object in the table that has the smallest distance, for this is the xray position of our object
+print, ra[mind], dec[mind], dist[mind] ;prints the information of the XRAY detection associated with our source
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position: 209.28107,5.2517806
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+**** broad band ****
+
+srcflux repro/acisf14932_repro_evt2.fits "209.28107,5.2517806" single/run2
+
+
+Position                               0.5 - 7.0 keV                           
+                                       Value        90% Conf Interval          
+13 57 7.45 +5 15 6.4    Rate           0.000455 c/s (0.000308,0.000643)        
+                        Flux           4.03E-15 erg/cm2/s (2.72E-15,5.69E-15)  
+                        Mod.Flux       3.27E-15 erg/cm2/s (2.21E-15,4.62E-15)
+
+
+**** 0.5-2, 2-7 ****
+
+srcflux repro/acisf14932_repro_evt2.fits "209.28107,5.2517806" single/run3 bands="0.5:2:1.24,2:7:2.68"
+
+
+Summary of source fluxes
+
+Position                               0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          
+13 57 7.45 +5 15 6.4    Rate           0.000395 c/s (0.000258,0.000569)        6E-05 c/s (1.57E-05,0.000145)           
+                        Flux           1.73E-15 erg/cm2/s (1.13E-15,2.49E-15)  2.3E-15 erg/cm2/s (6E-16,5.57E-15)      
+                        Mod.Flux       1.9E-15 erg/cm2/s (1.24E-15,2.74E-15)   9.49E-16 erg/cm2/s (2.48E-16,2.3E-15)   
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				MRK 810
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+dmcopy "repro/acisf14933_repro_evt2.fits[EVENTS][bin x=4009:4209:1,y=4015:4215:1][energy=500:7000]" smallmrk810.fits
+
+mkpsfmap "smallmrk810.fits" outfile=psfmapmrk810.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smallmrk810.fits"
+pset wavdetect psffile=psfmapmrk810.fits
+pset wavdetect outfile=mrk810_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+
+in idl:
+
+d=mrdfits("mrk810_wav.fits",1,h)
+ra = d.ra 
+dec = d.dec 
+opt_ra = 215.654476
+opt_dec = 59.930875
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist
+mind = where(dist eq min(dist))
+print, ra[mind], dec[mind], dist[mind]
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position: 215.65438,59.930997
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+
+srcflux repro/acisf14933_repro_evt2.fits "215.65438,59.930997" single/run2 bands="broad,0.5:2:1.24,2:7:2.68"
+
+
+
+output:
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+14 22 37.05 +59 55 51.5 Rate           0.00389 c/s (0.00328,0.00449)           0.00276 c/s (0.00225,0.00327)           0.00113 c/s (0.000834,0.00149)          
+                        Flux           3.12E-14 erg/cm2/s (2.63E-14,3.61E-14)  1.32E-14 erg/cm2/s (1.07E-14,1.56E-14)  1.8E-14 erg/cm2/s (1.33E-14,2.37E-14)   
+                        Mod.Flux       2.81E-14 erg/cm2/s (2.38E-14,3.25E-14)  1.33E-14 erg/cm2/s (1.09E-14,1.58E-14)  1.8E-14 erg/cm2/s (1.32E-14,2.37E-14) 
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				IC 0862
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+dmcopy "repro/acisf14935_repro_evt2.fits[EVENTS][bin x=3973:4173:1,y=3989:4189:1][energy=500:7000]" smallic0862.fits
+
+mkpsfmap "smallic0862.fits" outfile=psfmapic0862.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smallic0862.fits"
+pset wavdetect psffile=psfmapic0862.fits
+pset wavdetect outfile=ic0862_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+
+in idl:
+
+d=mrdfits("ic0862_wav.fits",1,h)
+ra = d.ra 
+dec = d.dec 
+opt_ra = 199.064103
+opt_dec = 20.047679
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist
+mind = where(dist eq min(dist))
+print, ra[mind], dec[mind], dist[mind]
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position:199.06408,20.047318
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+
+srcflux repro/acisf14935_repro_evt2.fits "199.06408,20.047318" single/run2 bands="broad,0.5:2:1.24,2:7:2.68"
+
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				NGC 2518
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+dmcopy "repro/acisf14936_repro_evt2.fits[EVENTS][bin x=3977:4177:1,y=4008:4208:1][energy=500:7000]" smalln2518.fits
+
+mkpsfmap "smalln2518.fits" outfile=psfmapn2518.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smalln2518.fits"
+pset wavdetect psffile=psfmapn2518.fits
+pset wavdetect outfile=n2518_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+
+in idl:
+
+d=mrdfits("n2518_wav.fits",1,h)
+ra = d.ra 
+dec = d.dec 
+opt_ra = 121.834387
+opt_dec = 51.131600
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist
+mind = where(dist eq min(dist))
+print, ra[mind], dec[mind], dist[mind]
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position:121.83462,51.131783
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+
+srcflux repro/acisf14936_repro_evt2.fits "121.83462,51.131783" single/run2 bands="broad,0.5:2:1.24,2:7:2.68"
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+8 7 20.30 +51 7 54.4    Rate           0.000161 c/s (4.26E-06,0.000499)        0.000172 c/s (1.56E-05,0.000517)        0 c/s (NAN,0.000231)                    
+                        Flux           7.63E-16 erg/cm2/s (2.03E-17,2.37E-15)  9.27E-16 erg/cm2/s (8.43E-17,2.79E-15)  NAN erg/cm2/s (NAN,NAN)                 
+                        Mod.Flux       1.14E-15 erg/cm2/s (3.03E-17,3.55E-15)  8.14E-16 erg/cm2/s (7.4E-17,2.45E-15)   0 erg/cm2/s (NAN,3.66E-15)     
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				UGGC 08754
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+dmcopy "repro/acisf14937_repro_evt2.fits[EVENTS][bin x=4044:4244:1,y=4009:4209][energy=500:7000]" smallu08754.fits
+
+mkpsfmap "smallu08754.fits" outfile=psfmapsmallu08754.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smallu08754.fits"
+pset wavdetect psffile=psfmapsmallu08754.fits
+pset wavdetect outfile=u08754_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+
+in idl:
+
+d=mrdfits("u08754_wav.fits",1,h)
+ra = d.ra 
+dec = d.dec 
+opt_ra = 207.662903
+opt_dec = 35.038311
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist
+mind = where(dist eq min(dist))
+print, ra[mind], dec[mind], dist[mind]
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position:207.64766,35.048142
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+
+srcflux repro/acisf14937_repro_evt2.fits "207.64766,35.048142" single/run2 bands="broad,0.5:2:1.24,2:7:2.68"
+
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+13 50 35.43 +35 2 53.3  Rate           0.00206 c/s (0.00151,0.00274)           0.00166 c/s (0.00117,0.00228)           0.000393 c/s (0.000178,0.000732)        
+                        Flux           1.24E-14 erg/cm2/s (9.07E-15,1.65E-14)  8.05E-15 erg/cm2/s (5.67E-15,1.1E-14)   4.36E-15 erg/cm2/s (1.98E-15,8.12E-15)  
+                        Mod.Flux       1.56E-14 erg/cm2/s (1.14E-14,2.08E-14)  8.46E-15 erg/cm2/s (5.96E-15,1.16E-14)  6.53E-15 erg/cm2/s (2.97E-15,1.22E-14)
+
+
+
+
+
+
+
+
+##################################################################################
+##################################################################################
+##################################################################################
+				PGC 3091110
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+
+
+dmcopy "repro/acisf14934_repro_evt2.fits[EVENTS][bin x=3983:4183:1,y=3979:4179][energy=500:7000]" smallpgc.fits
+
+mkpsfmap "smallpgc.fits" outfile=psfmappgc.fits energy=1.4967 ecf=0.9
+
+punlearn wavdetect
+
+pset wavdetect infile="smallpgc.fits"
+pset wavdetect psffile=psfmappgc.fits
+pset wavdetect outfile=pgc_wav.fits
+#say scale = 1 1.4 2 2.8 4
+
+
+wavdetect
+
+
+
+
+
+in idl:
+
+d=mrdfits("pgc_wav.fits",1,h)
+ra = d.ra 
+dec = d.dec 
+opt_ra = 139.331873
+opt_dec = 11.628686
+gcirc, 2, ra, dec, opt_ra, opt_dec, dist
+mind = where(dist eq min(dist))
+print, ra[mind], dec[mind], dist[mind]
+
+you'll probably only get a few though so you can probably just compare the optical RA to one of the detections to see which is closest.
+
+XRAY detected position:139.33190,11.628627
+
+
+
+now, this can be used
+
+
+punlearn srcflux
+
+
+
+srcflux repro/acisf14934_repro_evt2.fits "139.33190,11.628627" single/run2 bands="broad,0.5:2:1.24,2:7:2.68"
+
+
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+9 17 19.65 +11 37 43.0  Rate           0.00389 c/s (0.00295,0.00502)           0.0027 c/s (0.00193,0.00365)            0.00119 c/s (0.000701,0.00186)          
+                        Flux           2.79E-14 erg/cm2/s (2.12E-14,3.6E-14)   1.28E-14 erg/cm2/s (9.16E-15,1.74E-14)  1.51E-14 erg/cm2/s (8.91E-15,2.36E-14)  
+                        Mod.Flux       2.84E-14 erg/cm2/s (2.15E-14,3.66E-14)  1.32E-14 erg/cm2/s (9.44E-15,1.79E-14)  1.89E-14 erg/cm2/s (1.11E-14,2.96E-14)
+
+
+
+
+
+
+
+
+
+
+
+
+testing w/ srcreg and bkgreg, used a src region of 3" and a background region of 15"-25"
+
+
+n5373
+
+srcflux repro/acisf14932_repro_evt2.fits "209.28107,5.2517806" single/run7 srcreg='circle(4104.964,4116.480,6.09756)' bkgreg='annulus(4104.964,4116.480,30.4878,50.813)' bands="broad,0.5:2:1.24,2:7:2.68" clobber=yes
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+13 57 7.45 +5 15 6.4    Rate           0.000769 c/s (0.00057,0.00101)          0.000648 c/s (0.000469,0.000866)        0.000121 c/s (4.56E-05,0.000238)        
+                        Flux           5.33E-15 erg/cm2/s (3.95E-15,6.99E-15)  2.88E-15 erg/cm2/s (2.09E-15,3.85E-15)  2.45E-15 erg/cm2/s (9.2E-16,4.8E-15)    
+                        Mod.Flux       5.53E-15 erg/cm2/s (4.1E-15,7.26E-15)   3.12E-15 erg/cm2/s (2.26E-15,4.17E-15)  1.92E-15 erg/cm2/s (7.21E-16,3.76E-15)  
+
+
+
+mrk810 ****CHANGE, THIS IS KINDA WRONG. n2518 NEEDS THE NEW RADIUS. OR WHATEVER
+
+srcflux repro/acisf14933_repro_evt2.fits "215.65438,59.930997" single/run7 srcreg='circle(4109.5156,4114.7733,6.09756)' bkgreg='annulus(4109.5156,4114.7733,30.4878,40.6504)' bands="broad,0.5:2:1.24,2:7:2.68" clobber=yes
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+14 22 37.05 +59 55 51.5 Rate           0.00463 c/s (0.00397,0.00529)           0.00338 c/s (0.00282,0.00395)           0.00125 c/s (0.000933,0.00163)          
+                        Flux           3.49E-14 erg/cm2/s (2.99E-14,3.99E-14)  1.6E-14 erg/cm2/s (1.33E-14,1.87E-14)   1.89E-14 erg/cm2/s (1.41E-14,2.46E-14)  
+                        Mod.Flux       3.35E-14 erg/cm2/s (2.87E-14,3.83E-14)  1.64E-14 erg/cm2/s (1.36E-14,1.91E-14)  1.98E-14 erg/cm2/s (1.48E-14,2.59E-14) 
+
+
+
+
+ic0862
+
+srcflux repro/acisf14935_repro_evt2.fits "199.06408,20.047318" single/run7 srcreg='circle(4073.6756,4085.1911,6.09756)' bkgreg='annulus(4073.6756,4085.1911,30.4878,50.813)' bands="broad,0.5:2:1.24,2:7:2.68" clobber=yes
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+13 16 15.37 +20 2 50.3  Rate           0.000611 c/s (0.000407,0.000867)        0.000611 c/s (0.000412,0.000861)        8.75E-07 c/s (0,9.51E-05)               
+                        Flux           2.68E-15 erg/cm2/s (1.79E-15,3.81E-15)  3.09E-15 erg/cm2/s (2.09E-15,4.36E-15)  NAN erg/cm2/s (NAN,NAN)                 
+                        Mod.Flux       4.36E-15 erg/cm2/s (2.91E-15,6.19E-15)  2.91E-15 erg/cm2/s (1.96E-15,4.1E-15)   1.39E-17 erg/cm2/s (0,1.51E-15)
+
+
+
+
+n2518
+
+srcflux repro/acisf14936_repro_evt2.fits "121.83462,51.131783" single/run7 srcreg='circle(4079.3644,4107.3778,6.09756)' bkgreg='annulus(4079.3644,4107.3778,30.4878,50.813)' bands="broad,0.5:2:1.24,2:7:2.68" clobber=yes
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+8 7 20.30 +51 7 54.4    Rate           0.000836 c/s (0.000424,0.00143)         0.000765 c/s (0.000383,0.00133)         6.93E-05 c/s (0,0.000365)               
+                        Flux           3.28E-15 erg/cm2/s (1.66E-15,5.61E-15)  3.32E-15 erg/cm2/s (1.66E-15,5.79E-15)  NAN erg/cm2/s (NAN,NAN)                 
+                        Mod.Flux       5.94E-15 erg/cm2/s (3.01E-15,1.02E-14)  3.62E-15 erg/cm2/s (1.81E-15,6.32E-15)  1.1E-15 erg/cm2/s (0,5.78E-15)     
+  
+
+
+
+u08754
+
+srcflux repro/acisf14937_repro_evt2.fits "207.64766,35.048142" single/run7 srcreg='circle(4206.2267,4182.4711,6.09756)' bkgreg='annulus(4206.2267,4182.4711,30.4878,50.813)' bands="broad,0.5:2:1.24,2:7:2.68" clobber=yes
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+13 50 35.43 +35 2 53.3  Rate           0.00218 c/s (0.0016,0.00288)            0.00172 c/s (0.00122,0.00235)           0.000451 c/s (0.000216,0.000812)        
+                        Flux           1.28E-14 erg/cm2/s (9.42E-15,1.69E-14)  8.25E-15 erg/cm2/s (5.85E-15,1.13E-14)  4.52E-15 erg/cm2/s (2.16E-15,8.14E-15)  
+                        Mod.Flux       1.65E-14 erg/cm2/s (1.22E-14,2.18E-14)  8.77E-15 erg/cm2/s (6.22E-15,1.2E-14)   7.5E-15 erg/cm2/s (3.59E-15,1.35E-14)  
+
+
+pgc3091110
+
+srcflux repro/acisf14934_repro_evt2.fits "139.33190,11.628627" single/run7 srcreg='circle(4082.209,4079.502,6.09756)' bkgreg='annulus(4082.209,4079.502,30.4878,50.813)' bands="broad,0.5:2:1.24,2:7:2.68"
+
+Summary of source fluxes
+
+Position                               0.5 - 7.0 keV                           0.5 - 2.0 keV                           2.0 - 7.0 keV                           
+                                       Value        90% Conf Interval          Value        90% Conf Interval          Value        90% Conf Interval          
+9 17 19.65 +11 37 43.0  Rate           0.00418 c/s (0.00319,0.00534)           0.00279 c/s (0.002,0.00376)             0.00138 c/s (0.000851,0.0021)           
+                        Flux           3.49E-14 erg/cm2/s (2.67E-14,4.46E-14)  1.31E-14 erg/cm2/s (9.42E-15,1.77E-14)  2.18E-14 erg/cm2/s (1.34E-14,3.31E-14)  
+                        Mod.Flux       3.05E-14 erg/cm2/s (2.33E-14,3.9E-14)   1.37E-14 erg/cm2/s (9.82E-15,1.84E-14)  2.2E-14 erg/cm2/s (1.35E-14,3.34E-14)
+
+
+
+
+
+
+
+Final version:
+
+To find the count rate, flux, and mod. flux, the task srcflux in CIAO was used. The task was implemented on a reprogrammed version of the evt2 file for each galaxy. To find the center of the region around the galaxy, which must be specified, wavdetect was used. The input file for wavdetect was a smaller version (200x200 pixels) of the evt2 file centered around the optical center of the galaxy. An energy filter of .5 keV-7 keV was also employed. Mkpsf created a psf of that smaller file. Parameter values of energy=1.4967 ecf=0.9 were used. This psf and the smaller copy of the evt2 file were inputs to wavdetect, including scale values of  1, 1.4, 2, 2.8, 4. No other parameters were specified. The output of wavdetect was imported into IDL, where gcirc was used to find the distance between the position of sources from the wavdetect  file and the optical position of the target galaxy. The smallest distance was verified to be the X-Ray center of the target galaxy, and this center value was used in srcflux as the center of the region. Before executing srcflux, srcreg and bkgreg were specified using a circle and annulus, respectively. Physical values were used for both parameters. The center of both the circle and annulus is the physical value corresponding to the center wavdetect found. A radius of 3" (6.09756 units) was used for the circle. Radii of 15" (30.4878) and 25" (50.813) were used in all cases except for NGC 2518 because another source was present at a radius of about 21", so an ending bound of 20" (40.6504) was used instead of 25". Srcflux was run for the following energy bands: broad (0.5 keV-7.0 keV), 0.5 keV-2.0 keV, and 2.0 keV-7.0 keV).
+

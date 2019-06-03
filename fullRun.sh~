@@ -1,0 +1,3452 @@
+#!/bin/bash
+
+
+# to make script executeable type this in the command line: chmod +x fullRun.sh
+
+
+
+#this script will scale the psf & run galfit  for a galaxy within the galaxy's individual directory, rename all the files to be specific to each galaxy and band (i or g), move them out to the folder containing all of the galaxy folders,and then switch directories. It will then do the same thing for each of the other galaxies, first completing the i band for a galaxy then doing the g band. When all files are created that will be needed to plot, the script will then call the plotting script and make a pdf of all the plots.
+
+
+#before beginning this script, you must already have a "zoomed in" sdss file (probably named sdssi.fits) and a psfi file. The script starts at the step where everything is scaled and converted to the right units and it will end by making pretty plots. Some user input is required. Execute this script within the folder of the individual galaxy.
+
+
+
+#note you need to remove the following from iraf before executing bash scripts:
+#stty xgterm
+#if (access ("home$loginuser.cl"))
+#    cl < "home$loginuser.cl"
+#;
+#then move the login.cl file to your directory
+
+
+
+# REQUIRED FILES FOR EACH GALAXY FOLDER:
+#         1)frame-band-galaxy.fits file
+#         2)sdssi.fits file
+#         3)psfTest.fits file
+#         4)psf2ellipse.sh 
+#         5)galfit program
+#         6)scale.cl (really only necessary for NGC 5373i folder)
+#         7)gal.txt
+#         8)galManip.py
+#         9)login.cl
+#        10)ellipseScripti.cl or ellipseScriptg.cl, depending on i or g band
+#        11)starpsf.txt (for renaming purposes)
+#        12)editScale.py
+#        13)editGal.py
+#        14)editEllipsei.py or editEllipseg.py, depending on i or g band
+
+
+
+# the n5373i folder needs an additional empty .txt file called zeros.txt, the frameNames.txt file, the centers.txt file, the imDim.txt file, the geomparx0.txt file, the geompary0.txt file, and the sdssMags.txt file.
+
+# note that the ellipseScript files are different for every galaxy and should be tailored. Unless I decide to automate that later.. 
+
+# fullRun.sh should be located in a folder outside of each individual galaxy folder, i.e. in something like /Users/research/fullRun/. NOT /Users/research/fullRun/n5373i/.
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                           LET'S BEGIN!                                  "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "NGC 5373, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/n5373i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+chmod +x editGal.py
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/n5373i
+
+
+mv sdssi.idl sdssn5373i.idl
+cp sdssn5373i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfn5373i.idl
+cp psfn5373i.idl /Users/research/fullRun/.
+
+mv modeli.idl modeln5373i.idl
+cp modeln5373i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssn5373i_corr.tab
+mv psfi.tab psfn5373i.tab
+mv sdssi.fits sdssn5373i.fits
+mv sdssi_corr.fits sdssn5373i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/n5373g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modeln5373i.tab
+
+mv modeli.fits modeln5373i.fits
+mv psfTest.fits psfTestn5373i.fits
+mv psfi.fits psfn5373i.fits
+mv psfi_corr.fits psfn5373i_corr.fits
+mv fiti_block.fits fiti_blockn5373i.fits
+mv fiti_block2.fits fiti_blockn5373i2.fits
+mv galCorr.txt galn5373i.txt
+mv gal2.txt gal2n5373i.txt
+mv fit.log fitn5373i.log
+mv starpsf.txt starpsfn5373i.txt
+
+
+mv zeros.txt /Users/research/fullRun/n5373g/.
+mv scale.cl /Users/research/fullRun/n5373g/.
+mv frameNames.txt /Users/research/fullRun/n5373g/.
+mv sdssMags.txt /Users/research/fullRun/n5373g/.
+mv imDim.txt /Users/research/fullRun/n5373g/.
+mv centers.txt /Users/research/fullRun/n5373g/.
+mv geomparx0.txt /Users/research/fullRun/n5373g/.
+mv geompary0.txt /Users/research/fullRun/n5373g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "NGC 5373, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/n5373g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+chmod +x editGal.py
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssn5373g.idl
+cp sdssn5373g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfn5373g.idl
+cp psfn5373g.idl /Users/research/fullRun/.
+
+mv modeli.idl modeln5373g.idl
+cp modeln5373g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssn5373g_corr.tab
+mv psfi.tab psfn5373g.tab
+mv sdssi.fits sdssn5373g.fits
+mv sdssi_corr.fits sdssn5373g_corr.fits
+mv modeli.tab modeln5373i.tab
+mv modelg.fits model5373g.fits
+mv psfTest.fits psfTestn5373g.fits
+mv psfi.fits psfn5373g.fits
+mv psfi_corr.fits psfn5373g_corr.fits
+mv fiti_block.fits fiti_blockn5373g.fits
+mv fiti_block2.fits fiti_blockn5373g2.fits
+mv galCorr.txt galn5373g.txt
+mv gal2.txt gal2n5373g.txt
+mv fit.log fitn5373g.log
+mv starpsf.txt starpsfn5373g.txt
+
+mv zeros.txt /Users/research/fullRun/ic0862i/.
+mv scale.cl /Users/research/fullRun/ic0862i/.
+mv frameNames.txt /Users/research/fullRun/ic0862i/.
+mv sdssMags.txt /Users/research/fullRun/ic0862i/.
+mv imDim.txt /Users/research/fullRun/ic0862i/.
+mv centers.txt /Users/research/fullRun/ic0862i/.
+mv geomparx0.txt /Users/research/fullRun/ic0862i/.
+mv geompary0.txt /Users/research/fullRun/ic0862i/.
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "IC 0862, i band----------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/ic0862i
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+
+EOF
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssic0862i.idl
+cp sdssic0862i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfic0862i.idl
+cp psfic0862i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelic0862i.idl
+cp modelic0862i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssic0862i_corr.tab
+mv psfi.tab psfic0862i.tab
+mv sdssi.fits sdssic0862i.fits
+mv sdssi_corr.fits sdssic0862i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/ic0862g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelic0862i.tab
+
+mv modeli.fits modelic0862i.fits
+mv psfTest.fits psfTestic0862i.fits
+mv psfi.fits psfic0862i.fits
+mv psfi_corr.fits psfic0862i_corr.fits
+mv fiti_block.fits fiti_blockic0862i.fits
+mv fiti_block2.fits fiti_blockic0862i2.fits
+mv galCorr.txt galic0862i.txt
+mv gal2.txt gal2ic0862i.txt
+mv fit.log fitic0862i.log
+mv starpsf.txt starpsfic0862i.txt
+
+mv zeros.txt /Users/research/fullRun/ic0862g/.
+mv scale.cl /Users/research/fullRun/ic0862g/.
+mv frameNames.txt /Users/research/fullRun/ic0862g/.
+mv sdssMags.txt /Users/research/fullRun/ic0862g/.
+mv imDim.txt /Users/research/fullRun/ic0862g/.
+mv centers.txt /Users/research/fullRun/ic0862g/.
+mv geomparx0.txt /Users/research/fullRun/ic0862g/.
+mv geompary0.txt /Users/research/fullRun/ic0862g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "IC 0862, g band----------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/ic0862g
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+
+EOF
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssic0862g.idl
+cp sdssic0862g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfic0862g.idl
+cp psfic0862g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelic0862g.idl
+cp modelic0862g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssic0862g_corr.tab
+mv psfi.tab psfic0862g.tab
+mv sdssi.fits sdssic08762g.fits
+mv sdssi_corr.fits sdssic0862g_corr.fits
+mv modeli.tab modelic0862i.tab
+mv modelg.fits modelic0862g.fits
+mv psfTest.fits psfTestic0862g.fits
+mv psfi.fits psfic0862g.fits
+mv psfi_corr.fits psfic0862g_corr.fits
+mv fiti_block.fits fiti_blockic0862g.fits
+mv fiti_block2.fits fiti_blockic0862g2.fits
+mv galCorr.txt galic0862g.txt
+mv gal2.txt gal2ic0862g.txt
+mv fit.log fitic0862g.log
+mv starpsf.txt starpsfic0862g.txt
+
+mv zeros.txt /Users/research/fullRun/mrk810i/.
+mv scale.cl /Users/research/fullRun/mrk810i/.
+mv frameNames.txt /Users/research/fullRun/mrk810i/.
+mv sdssMags.txt /Users/research/fullRun/mrk810i/.
+mv imDim.txt /Users/research/fullRun/mrk810i/.
+mv centers.txt /Users/research/fullRun/mrk810i/.
+mv geomparx0.txt /Users/research/fullRun/mrk810i/.
+mv geompary0.txt /Users/research/fullRun/mrk810i/.
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "MRK 810, i band----------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+cd /Users/research/fullRun/mrk810i
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+
+cl < ellipseScripti.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssmrk810i.idl
+cp sdssmrk810i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfmrk810i.idl
+cp psfmrk810i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelmrk810i.idl
+cp modelmrk810i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssmrk810i_corr.tab
+mv psfi.tab psfmrk810i.tab
+mv sdssi.fits sdssmrk810i.fits
+mv sdssi_corr.fits sdssmrk810i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/mrk810g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelmrk810i.tab
+
+mv modeli.fits modelmrk810i.fits
+mv psfTest.fits psfTestmrk810i.fits
+mv psfi.fits psfmrk810i.fits
+mv psfi_corr.fits psfmrk810i_corr.fits
+mv fiti_block.fits fiti_blockmrk810i.fits
+mv fiti_block2.fits fiti_blockmrk810i2.fits
+mv galCorr.txt galmrk810i.txt
+mv gal2.txt gal2mrk810i.txt
+mv fit.log fitmrk810i.log
+mv starpsf.txt starpsfmrk810i.txt
+
+mv zeros.txt /Users/research/fullRun/mrk810g/.
+mv scale.cl /Users/research/fullRun/mrk810g/.
+mv frameNames.txt /Users/research/fullRun/mrk810g/.
+mv sdssMags.txt /Users/research/fullRun/mrk810g/.
+mv imDim.txt /Users/research/fullRun/mrk810g/.
+mv centers.txt /Users/research/fullRun/mrk810g/.
+mv geomparx0.txt /Users/research/fullRun/mrk810g/.
+mv geompary0.txt /Users/research/fullRun/mrk810g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "MRK 810, g band----------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+cd /Users/research/fullRun/mrk810g
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssmrk810g.idl
+cp sdssmrk810g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfmrk810g.idl
+cp psfmrk810g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelmrk810g.idl
+cp modelmrk810g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssmrk810g_corr.tab
+mv psfi.tab psfmrk810g.tab
+mv sdssi.fits sdssmrk810g.fits
+mv sdssi_corr.fits sdssmrk810g_corr.fits
+mv modeli.tab modelmrk810i.tab
+mv modelg.fits modelmrk810g.fits
+mv psfTest.fits psfTestmrk810g.fits
+mv psfi.fits psfmrk810g.fits
+mv psfi_corr.fits psfmrk810g_corr.fits
+mv fiti_block.fits fiti_blockmrk810g.fits
+mv fiti_block2.fits fiti_blockmrk810g2.fits
+mv galCorr.txt galmrk810g.txt
+mv gal2.txt gal2mrk810g.txt
+mv fit.log fitmrk810g.log
+mv starpsf.txt starpsfmrk810g.txt
+
+mv zeros.txt /Users/research/fullRun/n2518i/.
+mv scale.cl /Users/research/fullRun/n2518i/.
+mv frameNames.txt /Users/research/fullRun/n2518i/.
+mv sdssMags.txt /Users/research/fullRun/n2518i/.
+mv imDim.txt /Users/research/fullRun/n2518i/.
+mv centers.txt /Users/research/fullRun/n2518i/.
+mv geomparx0.txt /Users/research/fullRun/n2518i/.
+mv geompary0.txt /Users/research/fullRun/n2518i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "NGC 2518, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+cd /Users/research/fullRun/n2518i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+
+#finds ellipses. use the i band version.
+cl <<EOF
+
+cl < ellipseScripti.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssn2518i.idl
+cp sdssn2518i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfn2518i.idl
+cp psfn2518i.idl /Users/research/fullRun/.
+
+mv modeli.idl modeln2518i.idl
+cp modeln2518i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssn2518i_corr.tab
+mv psfi.tab psfn2518i.tab
+mv sdssi.fits sdssn2518i.fits
+mv sdssi_corr.fits sdssn2518i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/n2518g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modeln2518i.tab
+
+mv modeli.fits modeln2518i.fits
+mv psfTest.fits psfTestn2518i.fits
+mv psfi.fits psfn2518i.fits
+mv psfi_corr.fits psfn2518i_corr.fits
+mv fiti_block.fits fiti_blockn2518i.fits
+mv fiti_block2.fits fiti_blockn2518i2.fits
+mv galCorr.txt galn2518i.txt
+mv gal2.txt gal2n2518i.txt
+mv fit.log fitn2518i.log
+mv starpsf.txt starpsfn2518i.txt
+
+mv zeros.txt /Users/research/fullRun/n2518g/.
+mv scale.cl /Users/research/fullRun/n2518g/.
+mv frameNames.txt /Users/research/fullRun/n2518g/.
+mv sdssMags.txt /Users/research/fullRun/n2518g/.
+mv imDim.txt /Users/research/fullRun/n2518g/.
+mv centers.txt /Users/research/fullRun/n2518g/.
+mv geomparx0.txt /Users/research/fullRun/n2518g/.
+mv geompary0.txt /Users/research/fullRun/n2518g/.
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "NGC 2518, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+cd /Users/research/fullRun/n2518g
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+cl < ellipseScriptg.cl
+
+EOF
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssn2518g.idl
+cp sdssn2518g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfn2518g.idl
+cp psfn2518g.idl /Users/research/fullRun/.
+
+mv modeli.idl modeln2518g.idl
+cp modeln2518g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssn2518g_corr.tab
+mv psfi.tab psfn2518g.tab
+mv sdssi.fits sdssn2518g.fits
+mv sdssi_corr.fits sdssn2518g_corr.fits
+mv modeli.tab modeln2518i.tab
+mv modelg.fits modelg2518g.fits
+mv psfTest.fits psfTestn2518g.fits
+mv psfi.fits psfn2518g.fits
+mv psfi_corr.fits psfn2518g_corr.fits
+mv fiti_block.fits fiti_blockn2518g.fits
+mv fiti_block2.fits fiti_blockn2518g2.fits
+mv galCorr.txt galn2518g.txt
+mv gal2.txt gal2n2518g.txt
+mv fit.log fitn2518g.log
+mv starpsf.txt starpsfn2518g.txt
+
+mv zeros.txt /Users/research/fullRun/u08754i/.
+mv scale.cl /Users/research/fullRun/u08754i/.
+mv frameNames.txt /Users/research/fullRun/u08754i/.
+mv sdssMags.txt /Users/research/fullRun/u08754i/.
+mv imDim.txt /Users/research/fullRun/u08754i/.
+mv centers.txt /Users/research/fullRun/u08754i/.
+mv geomparx0.txt /Users/research/fullRun/u08754i/.
+mv geompary0.txt /Users/research/fullRun/u08754i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "UGC 08754, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/u08754i
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+
+cl < ellipseScripti.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssu08754i.idl
+cp sdssu08754i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfu08754i.idl
+cp psfu08754i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelu08754i.idl
+cp modelu08754i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssu08754i_corr.tab
+mv psfi.tab psfu08754i.tab
+mv sdssi.fits sdssu08754i.fits
+mv sdssi_corr.fits sdssu08754i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/u08754g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelu08754i.tab
+
+mv modeli.fits modelu08754i.fits
+mv psfTest.fits psfTestu08754i.fits
+mv psfi.fits psfu08754i.fits
+mv psfi_corr.fits psfu08754i_corr.fits
+mv fiti_block.fits fiti_blocku08754i.fits
+mv fiti_block2.fits fiti_blocku08754i2.fits
+mv galCorr.txt galu08754i.txt
+mv gal2.txt gal2u08754i.txt
+mv fit.log fitu08754i.log
+mv starpsf.txt starpsfu08754i.txt
+
+mv zeros.txt /Users/research/fullRun/u08754g/.
+mv scale.cl /Users/research/fullRun/u08754g/.
+mv frameNames.txt /Users/research/fullRun/u08754g/.
+mv sdssMags.txt /Users/research/fullRun/u08754g/.
+mv imDim.txt /Users/research/fullRun/u08754g/.
+mv centers.txt /Users/research/fullRun/u08754g/.
+mv geomparx0.txt /Users/research/fullRun/u08754g/.
+mv geompary0.txt /Users/research/fullRun/u08754g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "UGC 08754, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/u08754g
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+cl < ellipseScriptg.cl
+
+EOF
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssu08754g.idl
+cp sdssu08754g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfu08754g.idl
+cp psfu08754g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelu08754g.idl
+cp modelu08754g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssu08754g_corr.tab
+mv psfi.tab psfu08754g.tab
+mv sdssi.fits sdssu08754g.fits
+mv sdssi_corr.fits sdssu08754g_corr.fits
+mv modeli.tab modelu08754i.tab
+mv modelg.fits modelu08754g.fits
+mv psfTest.fits psfTestu08754g.fits
+mv psfi.fits psfu08754g.fits
+mv psfi_corr.fits psfu08754g_corr.fits
+mv fiti_block.fits fiti_blocku08754g.fits
+mv fiti_block2.fits fiti_blocku08754g2.fits
+mv galCorr.txt galu08754g.txt
+mv gal2.txt gal2u08754g.txt
+mv fit.log fitu08754g.log
+mv starpsf.txt starpsfu08754g.txt
+
+mv zeros.txt /Users/research/fullRun/pgci/.
+mv scale.cl /Users/research/fullRun/pgci/.
+mv frameNames.txt /Users/research/fullRun/pgci/.
+mv sdssMags.txt /Users/research/fullRun/pgci/.
+mv imDim.txt /Users/research/fullRun/pgci/.
+mv centers.txt /Users/research/fullRun/pgci/.
+mv geomparx0.txt /Users/research/fullRun/pgci/.
+mv geompary0.txt /Users/research/fullRun/pgci/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "PGC 3091110, i band------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/pgci
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+
+cl < ellipseScripti.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdsspgci.idl
+cp sdsspgci.idl /Users/research/fullRun/.
+
+mv psfi.idl psfpgci.idl
+cp psfpgci.idl /Users/research/fullRun/.
+
+mv modeli.idl modelpgci.idl
+cp modelpgci.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdsspgci_corr.tab
+mv psfi.tab psfpgci.tab
+mv sdssi.fits sdsspgci.fits
+mv sdssi_corr.fits sdsspgci_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/pgcg/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelpgci.tab
+
+mv modeli.fits modelpgci.fits
+mv psfTest.fits psfTestpgci.fits
+mv psfi.fits psfpgci.fits
+mv psfi_corr.fits psfpgci_corr.fits
+mv fiti_block.fits fiti_blockpgci.fits
+mv fiti_block2.fits fiti_blockpgci2.fits
+mv galCorr.txt galpgci.txt
+mv gal2.txt gal2pgci.txt
+mv fit.log fitpgci.log
+mv starpsf.txt starpsfpgci.txt
+
+mv zeros.txt /Users/research/fullRun/pgcg/.
+mv scale.cl /Users/research/fullRun/pgcg/.
+mv frameNames.txt /Users/research/fullRun/pgcg/.
+mv sdssMags.txt /Users/research/fullRun/pgcg/.
+mv imDim.txt /Users/research/fullRun/pgcg/.
+mv centers.txt /Users/research/fullRun/pgcg/.
+mv geomparx0.txt /Users/research/fullRun/pgcg/.
+mv geompary0.txt /Users/research/fullRun/pgcg/.
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                         SUCCESSFUL ENDING                               "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "PGC 3091110, g band------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+cd /Users/research/fullRun/pgcg
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdsspgcg.idl
+cp sdsspgcg.idl /Users/research/fullRun/.
+
+mv psfi.idl psfpgcg.idl
+cp psfpgcg.idl /Users/research/fullRun/.
+
+mv modeli.idl modelpgcg.idl
+cp modelpgcg.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdsspgcg_corr.tab
+mv psfi.tab psfpgcg.tab
+mv sdssi.fits sdsspgcg.fits
+mv sdssi_corr.fits sdsspgcg_corr.fits
+mv modeli.tab modelpgci.tab
+mv modelg.fits modelpgcg.fits
+mv psfTest.fits psfTestpgcg.fits
+mv psfi.fits psfpgcg.fits
+mv psfi_corr.fits psfpgcg_corr.fits
+mv fiti_block.fits fiti_blockpgcg.fits
+mv fiti_block2.fits fiti_blockpgcg2.fits
+mv galCorr.txt galpgcg.txt
+mv gal2.txt gal2pgcg.txt
+mv fit.log fitpgcg.log
+mv starpsf.txt starpsfpgcg.txt
+
+mv zeros.txt /Users/research/fullRun/v1231i/.
+mv scale.cl /Users/research/fullRun/v1231i/.
+mv frameNames.txt /Users/research/fullRun/v1231i/.
+mv sdssMags.txt /Users/research/fullRun/v1231i/.
+mv imDim.txt /Users/research/fullRun/v1231i/.
+mv centers.txt /Users/research/fullRun/v1231i/.
+mv geomparx0.txt /Users/research/fullRun/v1231i/.
+mv geompary0.txt /Users/research/fullRun/v1231i/.
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                           LET'S BEGIN!                                  "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1231, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v1231i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1231i
+
+
+mv sdssi.idl sdssv1231i.idl
+cp sdssv1231i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1231i.idl
+cp psfv1231i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1231i.idl
+cp modelv1231i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1231i_corr.tab
+mv psfi.tab psfnv1231i.tab
+mv sdssi.fits sdssnv1231i.fits
+mv sdssi_corr.fits sdssv1231i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v1231g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv1231i.tab
+
+mv modeli.fits modelv1231i.fits
+mv psfTest.fits psfTestv1231i.fits
+mv psfi.fits psfn5373i.fits
+mv psfi_corr.fits psfv1231i_corr.fits
+mv fiti_block.fits fiti_blockv1231i.fits
+mv fiti_block2.fits fiti_blockv1231i2.fits
+mv galCorr.txt galv1231i.txt
+mv gal2.txt gal2v1231i.txt
+mv fit.log fitv1231i.log
+mv starpsf.txt starpsfv1231i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v1231g/.
+mv scale.cl /Users/research/fullRun/v1231g/.
+mv frameNames.txt /Users/research/fullRun/v1231g/.
+mv sdssMags.txt /Users/research/fullRun/v1231g/.
+mv imDim.txt /Users/research/fullRun/v1231g/.
+mv centers.txt /Users/research/fullRun/v1231g/.
+mv geomparx0.txt /Users/research/fullRun/v1231g/.
+mv geompary0.txt /Users/research/fullRun/v1231g/.
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1231, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1231g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv1231g.idl
+cp sdssv1231g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1231g.idl
+cp psfv1231g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1231g.idl
+cp modelv1231g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1231g_corr.tab
+mv psfi.tab psfv1231g.tab
+mv sdssi.fits sdssv1231g.fits
+mv sdssi_corr.fits sdssv1231g_corr.fits
+mv modeli.tab modelv1231i.tab
+mv modelg.fits modelv1231g.fits
+mv psfTest.fits psfTestv1231g.fits
+mv psfi.fits psfv1231g.fits
+mv psfi_corr.fits psfv1231g_corr.fits
+mv fiti_block.fits fiti_blockv1231g.fits
+mv fiti_block2.fits fiti_blockv1231g2.fits
+mv galCorr.txt galv1231g.txt
+mv gal2.txt gal2v1231g.txt
+mv fit.log fitv1231g.log
+mv starpsf.txt starpsfv1231g.txt
+
+mv zeros.txt /Users/research/fullRun/v1154i/.
+mv scale.cl /Users/research/fullRun/v1154i/.
+mv frameNames.txt /Users/research/fullRun/v1154i/.
+mv sdssMags.txt /Users/research/fullRun/v1154i/.
+mv imDim.txt /Users/research/fullRun/v1154i/.
+mv centers.txt /Users/research/fullRun/v1154i/.
+mv geomparx0.txt /Users/research/fullRun/v1154i/.
+mv geompary0.txt /Users/research/fullRun/v1154i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1154, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v1154i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1154i
+
+
+mv sdssi.idl sdssv1154i.idl
+cp sdssv1154i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1154i.idl
+cp psfv1154i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1154i.idl
+cp modelv1154i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1154i_corr.tab
+mv psfi.tab psfv1154i.tab
+mv sdssi.fits sdssv1154i.fits
+mv sdssi_corr.fits sdssv1154i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v1154g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv1154i.tab
+
+mv modeli.fits modelv1154i.fits
+mv psfTest.fits psfTestv1154i.fits
+mv psfi.fits psfv1154i.fits
+mv psfi_corr.fits psfv1154i_corr.fits
+mv fiti_block.fits fiti_blockv1154i.fits
+mv fiti_block2.fits fiti_blockv1154i2.fits
+mv galCorr.txt galv1154i.txt
+mv gal2.txt gal2v1154i.txt
+mv fit.log fitv1154i.log
+mv starpsf.txt starpsfv1154i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v1154g/.
+mv scale.cl /Users/research/fullRun/v1154g/.
+mv frameNames.txt /Users/research/fullRun/v1154g/.
+mv sdssMags.txt /Users/research/fullRun/v1154g/.
+mv imDim.txt /Users/research/fullRun/v1154g/.
+mv centers.txt /Users/research/fullRun/v1154g/.
+mv geomparx0.txt /Users/research/fullRun/v1154g/.
+mv geompary0.txt /Users/research/fullRun/v1154g/.
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1154, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1154g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv1154g.idl
+cp sdssv1154g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1154g.idl
+cp psfv1154g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1154g.idl
+cp modelv1154g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1154g_corr.tab
+mv psfi.tab psfv1154g.tab
+mv sdssi.fits sdssv1154g.fits
+mv sdssi_corr.fits sdssv1154g_corr.fits
+mv modeli.tab modelv1154i.tab
+mv modelg.fits modelv1154g.fits
+mv psfTest.fits psfTestv1154g.fits
+mv psfi.fits psfv1154g.fits
+mv psfi_corr.fits psfv1154g_corr.fits
+mv fiti_block.fits fiti_blockv1154g.fits
+mv fiti_block2.fits fiti_blockv1154g2.fits
+mv galCorr.txt galv1154g.txt
+mv gal2.txt gal2v1154g.txt
+mv fit.log fitv1154g.log
+mv starpsf.txt starpsfv1154g.txt
+
+mv zeros.txt /Users/research/fullRun/v2092i/.
+mv scale.cl /Users/research/fullRun/v2092i/.
+mv frameNames.txt /Users/research/fullRun/v2092i/.
+mv sdssMags.txt /Users/research/fullRun/v2092i/.
+mv imDim.txt /Users/research/fullRun/v2092i/.
+mv centers.txt /Users/research/fullRun/v2092i/.
+mv geomparx0.txt /Users/research/fullRun/v2092i/.
+mv geompary0.txt /Users/research/fullRun/v2092i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 2092, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v2092i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v2092i
+
+
+mv sdssi.idl sdssv2092i.idl
+cp sdssv2092i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv2092i.idl
+cp psfv2092i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv2092i.idl
+cp modelv2092i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv2092i_corr.tab
+mv psfi.tab psfv2092i.tab
+mv sdssi.fits sdssv2092i.fits
+mv sdssi_corr.fits sdssv2092i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v2092g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv2092i.tab
+
+mv modeli.fits modelv2092i.fits
+mv psfTest.fits psfTestv2092i.fits
+mv psfi.fits psfv2092i.fits
+mv psfi_corr.fits psfv2092i_corr.fits
+mv fiti_block.fits fiti_blockv2092i.fits
+mv fiti_block2.fits fiti_blockv2092i2.fits
+mv galCorr.txt galv2092i.txt
+mv gal2.txt gal2v2092i.txt
+mv fit.log fitv2092i.log
+mv starpsf.txt starpsfv2092i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v2092g/.
+mv scale.cl /Users/research/fullRun/v2092g/.
+mv frameNames.txt /Users/research/fullRun/v2092g/.
+mv sdssMags.txt /Users/research/fullRun/v2092g/.
+mv imDim.txt /Users/research/fullRun/v2092g/.
+mv centers.txt /Users/research/fullRun/v2092g/.
+mv geomparx0.txt /Users/research/fullRun/v2092g/.
+mv geompary0.txt /Users/research/fullRun/v2092g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 2092, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v2092g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv2092g.idl
+cp sdssv2092g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfn5373g.idl
+cp psfv2092g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv2092g.idl
+cp modelv2092g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv2092g_corr.tab
+mv psfi.tab psfv2092g.tab
+mv sdssi.fits sdssv2092g.fits
+mv sdssi_corr.fits sdssv2092g_corr.fits
+mv modeli.tab modelv2092i.tab
+mv modelg.fits modelv2092g.fits
+mv psfTest.fits psfTestv2092g.fits
+mv psfi.fits psfv2092g.fits
+mv psfi_corr.fits psfv2092g_corr.fits
+mv fiti_block.fits fiti_blockv2092g.fits
+mv fiti_block2.fits fiti_blockv2092g2.fits
+mv galCorr.txt galv2092g.txt
+mv gal2.txt gal2v2092g.txt
+mv fit.log fitv2092g.log
+mv starpsf.txt starpsfv2092g.txt
+
+mv zeros.txt /Users/research/fullRun/v759i/.
+mv scale.cl /Users/research/fullRun/v759i/.
+mv frameNames.txt /Users/research/fullRun/v759i/.
+mv sdssMags.txt /Users/research/fullRun/v759i/.
+mv imDim.txt /Users/research/fullRun/v759i/.
+mv centers.txt /Users/research/fullRun/v759i/.
+mv geomparx0.txt /Users/research/fullRun/v759i/.
+mv geompary0.txt /Users/research/fullRun/v759i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 0759, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v759i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v759i
+
+
+mv sdssi.idl sdssv759i.idl
+cp sdssv759i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv759i.idl
+cp psfv759i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv759i.idl
+cp modelv759i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv759i_corr.tab
+mv psfi.tab psfv759i.tab
+mv sdssi.fits sdssv759i.fits
+mv sdssi_corr.fits sdssv759i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v759g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv759i.tab
+
+mv modeli.fits modelv759i.fits
+mv psfTest.fits psfTestv759i.fits
+mv psfi.fits psfnv759i.fits
+mv psfi_corr.fits psfv759i_corr.fits
+mv fiti_block.fits fiti_blockv759i.fits
+mv fiti_block2.fits fiti_blockv759i2.fits
+mv galCorr.txt galv759i.txt
+mv gal2.txt gal2v759i.txt
+mv fit.log fitv759i.log
+mv starpsf.txt starpsfv759i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v759g/.
+mv scale.cl /Users/research/fullRun/v759g/.
+mv frameNames.txt /Users/research/fullRun/v759g/.
+mv sdssMags.txt /Users/research/fullRun/v759g/.
+mv imDim.txt /Users/research/fullRun/v759g/.
+mv centers.txt /Users/research/fullRun/v759g/.
+mv geomparx0.txt /Users/research/fullRun/v759g/.
+mv geompary0.txt /Users/research/fullRun/v759g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 0759, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v759g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv759g.idl
+cp sdssv759g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv759g.idl
+cp psfv759g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv759g.idl
+cp modelv759g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv759g_corr.tab
+mv psfi.tab psfv759g.tab
+mv sdssi.fits sdssv759g.fits
+mv sdssi_corr.fits sdssv759g_corr.fits
+mv modeli.tab modelv759i.tab
+mv modelg.fits modelv759g.fits
+mv psfTest.fits psfTestv759g.fits
+mv psfi.fits psfv759g.fits
+mv psfi_corr.fits psfv759g_corr.fits
+mv fiti_block.fits fiti_blockv759g.fits
+mv fiti_block2.fits fiti_blockv759g2.fits
+mv galCorr.txt galv759g.txt
+mv gal2.txt gal2v759g.txt
+mv fit.log fitv759g.log
+mv starpsf.txt starpsfv759g.txt
+
+mv zeros.txt /Users/research/fullRun/v1030i/.
+mv scale.cl /Users/research/fullRun/v1030i/.
+mv frameNames.txt /Users/research/fullRun/v1030i/.
+mv sdssMags.txt /Users/research/fullRun/v1030i/.
+mv imDim.txt /Users/research/fullRun/v1030i/.
+mv centers.txt /Users/research/fullRun/v1030i/.
+mv geomparx0.txt /Users/research/fullRun/v1030i/.
+mv geompary0.txt /Users/research/fullRun/v1030i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1030, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v1030i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1030i
+
+
+mv sdssi.idl sdssv1030i.idl
+cp sdssv1030i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1030i.idl
+cp psfv1030i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1030i.idl
+cp modelv1030i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1030i_corr.tab
+mv psfi.tab psfv1030i.tab
+mv sdssi.fits sdssv1030i.fits
+mv sdssi_corr.fits sdssv1030i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v1030g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv1030i.tab
+
+mv modeli.fits modelv1030i.fits
+mv psfTest.fits psfTestv1030i.fits
+mv psfi.fits psfv1030i.fits
+mv psfi_corr.fits psfv1030i_corr.fits
+mv fiti_block.fits fiti_blockv1030i.fits
+mv fiti_block2.fits fiti_blockv1030i2.fits
+mv galCorr.txt galv1030i.txt
+mv gal2.txt gal2v1030i.txt
+mv fit.log fitv1030i.log
+mv starpsf.txt starpsfv1030i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v1030g/.
+mv scale.cl /Users/research/fullRun/v1030g/.
+mv frameNames.txt /Users/research/fullRun/v1030g/.
+mv sdssMags.txt /Users/research/fullRun/v1030g/.
+mv imDim.txt /Users/research/fullRun/v1030g/.
+mv centers.txt /Users/research/fullRun/v1030g/.
+mv geomparx0.txt /Users/research/fullRun/v1030g/.
+mv geompary0.txt /Users/research/fullRun/v1030g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1030, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1030g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv1030g.idl
+cp sdssv1030g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1030g.idl
+cp psfv1030g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1030g.idl
+cp modelv1030g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1030g_corr.tab
+mv psfi.tab psfv1030g.tab
+mv sdssi.fits sdssv1030g.fits
+mv sdssi_corr.fits sdssv1030g_corr.fits
+mv modeli.tab modelv1030i.tab
+mv modelg.fits modelv1030g.fits
+mv psfTest.fits psfTestv1030g.fits
+mv psfi.fits psfv1030g.fits
+mv psfi_corr.fits psfv1030g_corr.fits
+mv fiti_block.fits fiti_blockv1030g.fits
+mv fiti_block2.fits fiti_blockv1030g2.fits
+mv galCorr.txt galv1030g.txt
+mv gal2.txt gal2v1030g.txt
+mv fit.log fitv1030g.log
+mv starpsf.txt starpsfv1030g.txt
+
+mv zeros.txt /Users/research/fullRun/v1062i/.
+mv scale.cl /Users/research/fullRun/v1062i/.
+mv frameNames.txt /Users/research/fullRun/v1062i/.
+mv sdssMags.txt /Users/research/fullRun/v1062i/.
+mv imDim.txt /Users/research/fullRun/v1062i/.
+mv centers.txt /Users/research/fullRun/v1062i/.
+mv geomparx0.txt /Users/research/fullRun/v1062i/.
+mv geompary0.txt /Users/research/fullRun/v1062i/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1062, i band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+
+
+cd /Users/research/fullRun/v1062i
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipsei.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the i band version.
+cl <<EOF
+cl < ellipseScripti.cl
+EOF
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1062i
+
+
+mv sdssi.idl sdssv1062i.idl
+cp sdssv1062i.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1062i.idl
+cp psfv1062i.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1062i.idl
+cp modelv1062i.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1062i_corr.tab
+mv psfi.tab psfv1062i.tab
+mv sdssi.fits sdssv1062i.fits
+mv sdssi_corr.fits sdssv1062i_corr.fits
+
+#need to move a copy of modeli.fits to the g band folder before renaming
+cp modeli.tab /Users/research/fullRun/v1062g/.
+#now you can rename modeli.fits so it doesn't get confusing
+mv modeli.tab modelv1062i.tab
+
+mv modeli.fits modelv1062i.fits
+mv psfTest.fits psfTestv1062i.fits
+mv psfi.fits psfv1062i.fits
+mv psfi_corr.fits psfv1062i_corr.fits
+mv fiti_block.fits fiti_blockv1062i.fits
+mv fiti_block2.fits fiti_blockv1062i2.fits
+mv galCorr.txt galv1062i.txt
+mv gal2.txt gal2v1062i.txt
+mv fit.log fitv1062i.log
+mv starpsf.txt starpsfv1062i.txt
+
+
+mv zeros.txt /Users/research/fullRun/v1062g/.
+mv scale.cl /Users/research/fullRun/v1062g/.
+mv frameNames.txt /Users/research/fullRun/v1062g/.
+mv sdssMags.txt /Users/research/fullRun/v1062g/.
+mv imDim.txt /Users/research/fullRun/v1062g/.
+mv centers.txt /Users/research/fullRun/v1062g/.
+mv geomparx0.txt /Users/research/fullRun/v1062g/.
+mv geompary0.txt /Users/research/fullRun/v1062g/.
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "VCC 1062, g band---------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun/v1062g
+
+
+
+
+#make sure everything is executable
+chmod +x editScale.py
+chmod +x galManip.py
+chmod +x psf2ellipse.sh
+
+#edits scale.cl file to have correct frame name that corresponds to the galaxy
+./editScale.py
+
+#remove old scale.cl and rename scale2.cl to scale.cl to update.
+rm scale.cl
+mv scale2.cl scale.cl
+
+#remove old fileNames.txt and rename newNames.txt to fileNames.txt to update
+rm frameNames.txt
+mv newNames.txt frameNames.txt
+
+#scales the psf and sdss files, changes out of nanomaggy units
+cl <<EOF
+cl < scale.cl
+EOF
+
+#edits the gal.txt file so that it's tailored to the image dimensions and center for each individual galaxy
+
+./editGal.py
+
+#remove old imDim.txt and rename imDim2.txt to imDim.txt to update
+rm imDim.txt
+mv imDim2.txt imDim.txt
+
+#remove old centers.txt and rename centers2.txt to centers.txt to update
+rm centers.txt
+mv centers2.txt centers.txt
+
+#runs galfit the first time to fix zero point
+./galfit galCorr.txt
+
+#calculates zero point offset and creates another txt file for galfit with the corrected zero point magnitude. User input required.
+./galManip.py
+
+#remove old sdssMags.txt and rename newMags.txt to sdssMags.txt
+rm sdssMags.txt
+mv newMags.txt sdssMags.txt
+
+#runs galfit again but with corrected zero point mag and a new name for the fiti_block file. everything else is the same.   
+./galfit gal2.txt 
+
+#edits the ellipse script so it has the specific geompar center for each galaxy
+./editEllipseg.py
+
+#remove old geompar txt files and rename them
+rm geomparx0.txt
+rm geompary0.txt
+mv geomparx02.txt geomparx0.txt
+mv geompary02.txt geompary0.txt
+
+#finds ellipses. use the g band version.
+cl <<EOF
+
+cl < ellipseScriptg.cl
+EOF
+
+
+echo "-------------------------------------------------------------------------"
+echo "all tables/models have been created. Now changing all file names to be unique."
+echo "-------------------------------------------------------------------------"
+
+
+
+
+mv sdssi.idl sdssv1062g.idl
+cp sdssv1062g.idl /Users/research/fullRun/.
+
+mv psfi.idl psfv1062g.idl
+cp psfv1062g.idl /Users/research/fullRun/.
+
+mv modeli.idl modelv1062g.idl
+cp modelv1062g.idl /Users/research/fullRun/.
+
+
+mv sdssi_corr.tab sdssv1062g_corr.tab
+mv psfi.tab psfv1062g.tab
+mv sdssi.fits sdssv1062g.fits
+mv sdssi_corr.fits sdssv1062g_corr.fits
+mv modeli.tab modelv1062i.tab
+mv modelg.fits modelv1062g.fits
+mv psfTest.fits psfTestv1062g.fits
+mv psfi.fits psfv1062g.fits
+mv psfi_corr.fits psfv1062g_corr.fits
+mv fiti_block.fits fiti_blockv1062g.fits
+mv fiti_block2.fits fiti_blockv1062g2.fits
+mv galCorr.txt galv1062g.txt
+mv gal2.txt gal2v1062g.txt
+mv fit.log fitv1062g.log
+mv starpsf.txt starpsfv1062g.txt
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "files ready for plotting"
+echo "-------------------------------------------------------------------------"
+
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                             NOW PLOTTING                                "
+echo "                                                                         "
+echo "                                                                         "
+echo "-------------------------------------------------------------------------"
+
+
+cd /Users/research/fullRun
+
+
+idl <<EOF
+
+.compile colorPlotVoids.pro
+
+colorPlotVoids, finalPlotsVoids
+
+
+
+.compile colorPlotClusters.pro
+
+colorPlotClusters, finalPlotsClusters
+
+EOF
+
+
+
+
+
+
+echo "-------------------------------------------------------------------------"
+echo "                          SUCCESSFUL ENDING                              "
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "-------------------------------------------------------------------------"
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                                                                         "
+echo "                            JOB COMPLETE                                 "
+echo "-------------------------------------------------------------------------"
